@@ -45,11 +45,11 @@ grid_data <- expand.grid(x = x_range, y = y_range)
 
 # Calculate the slope (dy/dx) at each point
 grid_data <- grid_data %>%
-  mutate(dx = 0.1, dy = 0.1 * (exp(-x)))
+  mutate(dx = 0.1, dy = 0.1 * 2 * x)
 
-# Create the slope field plot
+# Create the Vector field plot
 ggplot(grid_data, aes(x = x, y = y)) +
   geom_segment(aes(xend = x + dx, yend = y + dy), 
                arrow = arrow(length = unit(0.2, "cm"))) +
   theme_minimal() +
-  labs(title = "Slope Field for y' = x^2", x = "x", y = "y")
+  labs(title = "Vector Field for y' = x^2", x = "x", y = "y")
