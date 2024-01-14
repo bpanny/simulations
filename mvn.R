@@ -19,18 +19,18 @@ bvn <- tibble(x = x, y = y) %>%
 ggplot(bvn, aes(x = x, y = y, fill = z)) +
   geom_tile() +
   scale_fill_viridis() +
-  labs(title = "Force Plot",
+  labs(title = "Bivariate Normal Plot",
        x = "x",
        y = "y",
-       fill = "Force (f)") +
+       fill = "Density") +
   theme_minimal() +
   theme(legend.position = "right")
 
 ggplot(bvn, aes(x = x, y = y, z = z)) +
   geom_contour_filled() +
-  labs(title = "Force Plot",
+  labs(title = "Bivariate Normal Plot",
        x = "x",
        y = "y",
-       fill = "Force (f)") +
+       fill = "Density") +
   theme_minimal() +
   theme(legend.position = "right")
