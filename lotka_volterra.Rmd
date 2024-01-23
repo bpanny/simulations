@@ -1,0 +1,192 @@
+---
+title: "Predator-Prey Simulation with Lotka-Volterra Equations"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: github_document
+---
+```{r}
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lotka-Volterra Equations
+
+The Lotka-Volterra equations, used to simulate predator-prey interactions, are a pair of first-order, non-linear, differential equations. They describe the dynamics of biological systems where two species interact, one as a predator and the other as prey:
+
+\[
+\frac{dP}{dt} = \alpha P - \beta P H
+\]
+
+\[
+\frac{dH}{dt} = -\gamma H + \delta P H
+\]
+
+where:
+
+- \( P \) is the number of preys (e.g., rabbits),
+- \( H \) is the number of predators (e.g., foxes),
+- \( \frac{dP}{dt} \) and \( \frac{dH}{dt} \) represent the growth rates of prey and predator populations,
+- \( \alpha, \beta, \gamma, \) and \( \delta \) are positive real constants that describe the interaction of the two species.
+
+The phase space plot shows the trajectories of both species in a graph, with the number of prey as the x-axis and the number of predators as the y-axis.
+
+
+```{r}
+library(deSolve)
+library(ggplot2)
+
+# Lotka-Volterra Model
+lotka_volterra <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dP <- alpha * P - beta * P * H
+    dH <- -gamma * H + delta * P * H
+    list(c(dP, dH))
+  })
+}
+
+# Parameters
+params <- c(alpha = 0.1,  # Prey birth rate
+            beta = 0.02,  # Prey death rate per predator
+            gamma = 0.3,  # Predator death rate
+            delta = 0.01) # Predator birth rate per prey
+
+# Initial State
+state <- c(P = 40,  # Initial prey population
+           H = 9)   # Initial predator population
+
+# Time
+times <- seq(0, 200, by = 0.1)
+
+# Solving the differential equations
+out <- ode(y = state, times = times, func = lotka_volterra, parms = params)
+
+# Creating a data frame for plotting
+out_df <- as.data.frame(out)
+colnames(out_df)[2:3] <- c("Prey", "Predators")
+
+# Plotting the phase space
+phase_space_plot <- ggplot(out_df, aes(x = Prey, y = Predators)) +
+  geom_path(color = "blue") +
+  theme_minimal() +
+  labs(title = "Predator-Prey Phase Space",
+       x = "Number of Prey",
+       y = "Number of Predators")
+
+print(phase_space_plot)
+```
+
+# Simulate Over Parameter Grid
+
+```{r}
+# Extended parameter grid
+params_grid <- expand.grid(alpha = seq(0.1, 0.3, length.out = 3),
+                           beta = seq(0.02, 0.05, length.out = 3),
+                           gamma = seq(0.3, 0.5, length.out = 3),
+                           delta = seq(0.01, 0.03, length.out = 3),
+                           P = seq(30, 50, length.out = 3),
+                           H = seq(5, 15, length.out = 3))
+
+# Time
+times <- seq(0, 100, by = 0.1)
+
+# Run simulations for each parameter set
+all_sims <- do.call(rbind, lapply(1:nrow(params_grid), function(i) {
+  params <- as.list(params_grid[i, ])
+  state <- c(P = params$P, H = params$H)
+  out <- ode(y = state, times = times, func = lotka_volterra, parms = params)
+  out_df <- as.data.frame(out)
+  out_df$params <- paste(params$alpha, params$beta, params$gamma, params$delta, params$P, params$H, sep = "_")
+  # Or instead assign each parameter to its own column in the data frame
+  # out_df$alpha <- params$alpha
+  # out_df$beta <- params$beta
+  # out_df$gamma <- params$gamma
+  # out_df$delta <- params$delta
+  # out_df$P_init <- params$P
+  # out_df$H_init <- params$H
+  out_df
+}))
+
+# Or you can separate the parameters out separately
+# all_sims %>% 
+#   separate(params, into = c("alpha", "beta", "gamma", "delta", "P_init", "H_init"), sep = "_")
+```
+
+# Animate the Results Over the Parameter Grid
+
+Doing it all at once is a lot, and a little confusing to change all the parameters at once, so let's do it one at a time!
+
+```{r}
+library(gganimate)
+# 
+# Create the ggplot object
+# p <- ggplot(all_sims, aes(x = P, y = H, group = params)) +
+#   geom_path(aes(color = params)) +
+#   labs(x = "Number of Prey", y = "Number of Predators") +
+#   theme_minimal()
+# 
+# Animate the plot with gganimate
+# animation <- p + 
+#   transition_states(params, transition_length = 2, state_length = 1) +
+#   enter_fade() + exit_fade()
+# 
+# 
+# Render and save the animation
+# anim_save("lotka_volterra_extended_animation.gif", animate(animation, nframes = 100, fps = 10))
+```
+
+```{r}
+library(dplyr)
+
+split_sims <- all_sims %>% 
+  separate(params, into = c("alpha", "beta", "gamma", "delta", "P_init", "H_init"), sep = "_") %>% 
+  mutate(across(where(is.character), ~as.numeric(.))) 
+
+# Fixed parameter values
+fixed_alpha <- 0.1
+fixed_beta <- 0.02
+fixed_gamma <- 0.3
+fixed_delta <- 0.01
+fixed_H_init <- 10
+
+# Filter all_sims for simulations with only the fixed parameters and varying P_init
+filtered_sims <- split_sims %>%
+  filter(alpha == fixed_alpha, 
+         beta == fixed_beta, 
+         gamma == fixed_gamma, 
+         delta == fixed_delta, 
+         H_init == fixed_H_init)
+```
+
+```{r}
+library(ggplot2)
+library(gganimate)
+
+# Assuming filtered_sims is your data frame with simulations for varying P_init
+
+# Create the ggplot object
+p <- ggplot(filtered_sims, aes(x = P, y = H, group = P_init)) +
+  geom_path(aes(color = as.factor(P_init))) +
+  labs(title = 'Predator-Prey Model with Varying Initial Prey Population',
+       subtitle = 'Initial Prey Population: {closest_state}',
+       x = "Number of Prey", 
+       y = "Number of Predators") +
+  theme_minimal() # +
+  # theme(legend.position = "none") # Remove the legend if not needed
+
+# Animate the plot with gganimate
+animation <- p + 
+  transition_states(P_init, transition_length = 2, state_length = 1) # +
+  # enter_fade() + exit_fade()
+
+# animate(animation, nframes = 100, fps = 10)
+
+# Render and save the animation
+anim_save("lotka_volterra_varying_p_init.gif", animate(animation, nframes = 100, fps = 10))
+```
+
+
+
+
