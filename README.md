@@ -1,11 +1,18 @@
 To do:
 
 Tidy things up
+
 Reaction Diffusion Equation and Pattern Formation
+
 Probabilistic Relational Agent Models
+
 Functional Agent-based Models
+
 GLMs
+
 Power and statistical errors in relation to sample size
+
+Relationships between Probability Distributions
 
 Chaos Theory and Fractals:
 Simulation: Implement the logistic map or the Mandelbrot set.
