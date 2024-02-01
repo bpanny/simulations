@@ -14,6 +14,8 @@ Power and statistical errors in relation to sample size
 
 Relationships between Probability Distributions
 
+Wave front expansion -> Tree front expansion?
+
 Chaos Theory and Fractals:
 Simulation: Implement the logistic map or the Mandelbrot set.
 Visualization: Create color-coded plots to show the chaotic behavior and fractal structures. The Mandelbrot set, in particular, can produce stunningly intricate visualizations.
