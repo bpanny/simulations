@@ -1,0 +1,64 @@
+---
+title: "Markov Chains"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Markov Chains
+
+$$
+V_1 = V_0 T
+$$
+
+```{r}
+nrows <- 20
+ncols <- nrows # square matrix
+
+
+tmat <- matrix(abs(rnorm(nrows * ncols)), ncol=ncols, byrow=T)
+tmat <- tmat / rowSums(tmat)
+tmats <- lapply(as.list(seq(0, 20, 1)), function(x){
+  if (x %% 1) {return(tmat%^%x)}
+  else {
+    newmat <- matrix(abs(rbinom(nrows * ncols, 100, .5)), ncol=ncols, byrow=T)
+    newmat <- newmat / rowSums(newmat)
+    return(tmat * newmat + newmat)
+  }
+})
+
+# tmats
+```
+
+```{r}
+library(tidyverse)
+data <- map_df(seq_along(tmats), ~as.data.frame(tmats[[.x]]) %>%
+                   mutate(Time = .x, Row = row_number()) %>%
+                   pivot_longer(cols = -c(Time, Row), names_to = "Column", values_to = "Value") %>%
+                   mutate(Column = as.numeric(gsub("V", "", Column))))  # Convert Column names to numeric
+```
+
+
+```{r}
+library(gganimate)
+library(gifski)
+
+p <- ggplot(data, aes(x = Column, y = Row, fill = Value)) + 
+    geom_tile() +  # Use geom_tile for matrix visualization
+    scale_fill_gradient(low = "blue", high = "red") +  # Color gradient
+    theme_minimal() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    labs(title = 'Time: {frame_time}', x = 'Column', y = 'Row') +
+    transition_time(Time) + 
+    ease_aes('linear')
+
+# Render the animation
+anim <- animate(p, nframes = 200, duration = 10, width = 400, height = 300, renderer = gifski_renderer())
+anim_save("matrix_animation_binom.gif", anim)
+anim
+```
+
