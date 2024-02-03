@@ -67,15 +67,23 @@ p <- ggplot(data, aes(x = Column, y = Row, fill = Value)) +
     geom_tile() +  # Use geom_tile for matrix visualization
     scale_fill_gradient(low = "blue", high = "red") +  # Color gradient
     theme_minimal() + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    theme(
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  # Adjust x-axis text size and angle
+        axis.text.y = element_text(size = 12),  # Adjust y-axis text size
+        axis.title = element_text(size = 14),  # Adjust axes titles size
+        legend.title = element_text(size = 12),  # Adjust legend title size
+        legend.text = element_text(size = 10),  # Adjust legend text size
+        legend.key.size = unit(1, "cm"),  # Adjust legend key size
+        plot.title = element_text(size = 16, hjust = 0.5)  # Adjust plot title size and alignment
+    ) +
     labs(title = 'Time: {frame_time}', x = 'Column', y = 'Row') +
     transition_time(Time) + 
     ease_aes('linear')
 
-# Render the animation
-anim <- animate(p, nframes = 200, duration = 10, width = 400, height = 300, renderer = gifski_renderer())
+# Render the animation with adjusted sizes
+anim <- animate(p, nframes = 200, duration = 10, width = 1000, height = 700, renderer = gifski_renderer())
 anim_save("matrix_animation_binom.gif", anim)
 anim
 ```
 
-![](markov_chains_files/figure-gfm/unnamed-chunk-3-1.gif)<!-- -->
+![](markov_chains_files/figure-gfm/fig.width-9-1.gif)<!-- -->
