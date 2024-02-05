@@ -1,5 +1,7 @@
 To do:
 
+Kalman Filter
+
 Tidy things up
 
 Reaction Diffusion Equation and Pattern Formation
