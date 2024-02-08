@@ -60,3 +60,34 @@ ggplot(dat, aes(x = p1, y = p2, fill = entropy)) +
 ```
 
 
+$$
+H(X) = -\sum_{k=1}^n p_k \log(p_k) \\
+\text{For equal probabilities} \\
+\begin{align}
+H(X) &= -\sum_{k=1}^n \frac{1}{n} \log(\frac{1}{n}) \\
+&= -n \left(\frac{1}{n} \log(\frac{1}{n}) \right) \\
+&= - \log(\frac{1}{n})
+\end{align}
+$$
+
+
+```{r}
+# Simplified and optimized entropy calculation for equal probability outcomes
+equal_outcome_entropy <- function(n) {
+  -log(1/n)
+}
+
+# Creating a tibble with n values
+eq_dat <- tibble(n = seq(1, 1e3, 1))
+
+# Vectorized computation of entropies
+eq_dat$entropies <- equal_outcome_entropy(eq_dat$n)
+```
+
+```{r}
+eq_dat %>% 
+  ggplot(aes(x = n, y = entropies)) +
+  geom_line()
+```
+
+
