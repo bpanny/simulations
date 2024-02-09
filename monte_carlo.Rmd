@@ -1,0 +1,187 @@
+---
+title: "Monte Carlo"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Monte Carlo
+
+The Monte Carlo method involves using randomness to solve problems that might be deterministic in principle. 
+
+## Estimate Pi
+
+In this example, we'll simulate random points within a square that encloses a quarter circle and use the ratio of points that land inside the quarter circle to those in the entire square to estimate π.
+
+1. **Generate random points** within a unit square (0 to 1 on the x and y axes).
+2. **Determine which points fall inside the quarter circle** within the square. The quarter circle is defined by \(x^2 + y^2 \leq 1\).
+3. **Calculate the ratio** of points inside the circle to the total number of points, and use this ratio to estimate π. The theoretical basis for this is that the area of the quarter circle is \(\pi/4\), and the area of the square is 1. Therefore, the ratio of points inside the quarter circle to the total points in the square should approximate \(\pi/4\).
+
+
+```{r}
+# Load necessary library
+library(ggplot2)
+
+# Sequence of n values
+n_values <- seq(1, 10000, by=1)
+
+# Initialize a vector to store pi estimates
+pi_estimates <- numeric(length(n_values))
+
+# Loop over n values
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  
+  # Generate random points
+  x <- runif(n)
+  y <- runif(n)
+  
+  # Check if points are inside the quarter circle
+  inside_circle <- x^2 + y^2 <= 1
+  
+  # Estimate Pi and store it
+  pi_estimates[i] <- 4 * sum(inside_circle) / n
+}
+
+# Data frame for plotting
+data_for_plot <- data.frame(
+  n = n_values,
+  PiEstimate = pi_estimates
+)
+
+# Plotting
+ggplot(data_for_plot, aes(x = n, y = PiEstimate)) +
+  geom_line() +
+  geom_hline(yintercept = pi, linetype="dashed", color = "red") +
+  theme_minimal() +
+  labs(title = "Monte Carlo Estimation of π",
+       x = "Number of Simulations",
+       y = "Estimated Value of π")
+
+```
+
+## Estimate mean and variance
+
+Let's consider an example where we estimate the mean and variance of a normally distributed random variable using the Monte Carlo method. In this case, instead of simulating points inside a square, we'll simulate a large number of observations from a normal distribution and use these observations to estimate its mean and variance.
+
+
+```{r}
+# Load necessary library
+library(ggplot2)
+
+# Sequence of n values
+n_values <- seq(1, 10000, by=1)
+
+# Initialize vectors to store estimates
+mean_estimates <- numeric(length(n_values))
+variance_estimates <- numeric(length(n_values))
+
+# True parameters
+true_mean <- 0
+true_sd <- 1
+
+# Loop over n values
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  observations <- rnorm(n, mean = true_mean, sd = true_sd)
+  mean_estimates[i] <- mean(observations)
+  variance_estimates[i] <- var(observations)
+}
+
+# Plotting the estimates
+data_for_plot <- data.frame(
+  n = n_values,
+  MeanEstimate = mean_estimates,
+  VarianceEstimate = variance_estimates
+)
+
+ggplot(data_for_plot) +
+  geom_line(aes(x = n, y = MeanEstimate, colour = "Mean")) +
+  geom_line(aes(x = n, y = VarianceEstimate, colour = "Variance")) +
+  scale_colour_manual(values = c("Mean" = "blue", "Variance" = "green")) +
+  theme_minimal() +
+  labs(title = "Monte Carlo Estimation of Parameters",
+       x = "Number of Observations",
+       y = "Estimate")
+```
+
+## Estimate chance of event
+
+Another common use of Monte Carlo methods in probability distributions is to estimate the probability of certain events. For example, you might want to estimate the probability that the sum of two dice exceeds a certain value,
+
+```{r}
+# Initialize a vector to store probability estimates
+probability_estimates <- numeric(length(n_values))
+
+# Loop over n values
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  roll_one <- sample(1:6, n, replace = TRUE)
+  roll_two <- sample(1:6, n, replace = TRUE)
+  sum_rolls <- roll_one + roll_two
+  probability_estimates[i] <- sum(sum_rolls > 9) / n
+}
+
+# Plotting the probability estimates
+data_for_prob_plot <- data.frame(
+  n = n_values,
+  ProbabilityEstimate = probability_estimates
+)
+
+ggplot(data_for_prob_plot, aes(x = n, y = ProbabilityEstimate)) +
+  geom_line(color = "red") +
+  theme_minimal() +
+  labs(title = "Monte Carlo Estimation of Probability",
+       x = "Number of Simulations",
+       y = "Estimated Probability")
+```
+
+## Estimate Financial Returns
+
+Or that a portfolio's return falls below a threshold in financial risk management.This just uses the same sampling from before, but the sampling could be replaced by a drift-diffusion process.
+
+```{r}
+# Load necessary library
+library(ggplot2)
+
+# Portfolio return parameters
+mean_return <- 0.08  # 8%
+std_deviation <- 0.10  # 10%
+return_threshold <- 0.05  # 5%
+
+# Sequence of n values
+n_values <- seq(1, 10000, by=1)
+
+# Initialize a vector to store probability estimates
+probability_estimates <- numeric(length(n_values))
+
+# Loop over n values
+for (i in seq_along(n_values)) {
+  n <- n_values[i]
+  
+  # Simulate n portfolio returns
+  simulated_returns <- rnorm(n, mean = mean_return, sd = std_deviation)
+  
+  # Estimate the probability that return exceeds the threshold
+  probability_estimates[i] <- sum(simulated_returns > return_threshold) / n
+}
+
+# Data for plotting
+data_for_plot <- data.frame(
+  n = n_values,
+  ProbabilityEstimate = probability_estimates
+)
+
+# Plotting
+ggplot(data_for_plot, aes(x = n, y = ProbabilityEstimate)) +
+  geom_line(color = "blue") +
+  theme_minimal() +
+  labs(title = "Monte Carlo Estimation of Exceeding a Return Threshold",
+       x = "Number of Simulations",
+       y = "Estimated Probability")
+```
+
