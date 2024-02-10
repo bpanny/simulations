@@ -1,0 +1,36 @@
+---
+title: "Relationships among probability distributions"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![Relationships among univariate probability distributions](Relationships_among_some_of_univariate_probability_distributions.jpg)
+
+```{r}
+library(tidyverse)
+```
+
+The binomial distribution is the sum of bernoulli trials of size n
+
+```{r}
+dat <- numeric()
+for (i in 1:5000){
+  val <- 0
+  for (j in 1:5){
+    val <- val + rbinom(1, 1, .5)
+  }
+  dat[i] <- val
+}
+
+dat <- tibble(ber = dat, binom = rbinom(5000, 5, .5))
+dat %>% 
+  pivot_longer(everything(), names_to = 'random_variable', values_to = "value") %>% 
+  ggplot(aes(x = value, fill = random_variable)) +
+  geom_density(alpha = .3)
+```
+
