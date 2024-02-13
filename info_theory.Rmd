@@ -9,6 +9,17 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Surprise
+
+Information is the resolution of uncertainty - Shannon
+
+Paid for by attention.
+
+$$
+S(x) = -\log p(x)
+$$
+
+
 ```{r}
 library(tidyverse)
 p <- seq(0.001, 1, by = .001)
@@ -61,20 +72,23 @@ ggplot(dat, aes(x = p1, y = p2, fill = entropy)) +
 
 
 $$
-H(X) = -\sum_{k=1}^n p_k \log(p_k) \\
+H(X) = -\sum_{k=1}^n p_k \log(p_k) = E[S(x)] \\
 \text{For equal probabilities} \\
 \begin{align}
 H(X) &= -\sum_{k=1}^n \frac{1}{n} \log(\frac{1}{n}) \\
 &= -n \left(\frac{1}{n} \log(\frac{1}{n}) \right) \\
-&= - \log(\frac{1}{n})
+&= - \log(\frac{1}{n}) \\
+&= \log(n) \\
+2^{H(X)} &= n
 \end{align}
 $$
 
+For base 2, the doubling of possible outcomes leads to the addition of a single bit to the average uncertainty, or entropy
 
 ```{r}
 # Simplified and optimized entropy calculation for equal probability outcomes
 equal_outcome_entropy <- function(n) {
-  -log(1/n)
+  log(n)
 }
 
 # Creating a tibble with n values
@@ -90,4 +104,116 @@ eq_dat %>%
   geom_line()
 ```
 
+Entropy depends only on the probability distribution of values, not on the values themselves. 
+
+Information is continuous (information rises and falls with probability), symmetric (order of outcomes doesn't matter), has a maximal value (equiprobable outcomes), and additive (information of outcomes can be added)
+
+# Capacity
+
+Channels go from Data -> Encoder -> Input -> Channel -> Output -> Decoder -> Data
+
+$$
+s, x = g(s), 
+$$
+
+The max number of bits a channel can communicate
+
+# Correlation, Mutual Information
+
+Correlation Coefficient
+The correlation coefficient measures the strength and direction of the linear relationship between two variables. The most common measure is Pearson's correlation coefficient, defined as:
+
+$$
+r_{xy} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2}\sqrt{\sum_{i=1}^{n}(y_i - \bar{y})^2}}
+$$
+
+Mutual Information
+Mutual information measures the amount of information that one variable contains about another variable. It is defined as:
+
+$$
+\begin{align}
+I(X; Y) &= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(\frac{p(x, y)}{p(x)p(y)}\right) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(p(x, y)\right) - \sum_{y \in Y} \sum_{x \in X} p(x, y) \log (p(x)) - \sum_{y \in Y} \sum_{x \in X} p(x, y)\log (p(y)) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(p(x, y)\right) - \sum_{x \in X} p(x) \log (p(x)) - \sum_{y \in Y} p(y)\log (p(y)) \\
+&= -H(X,Y) + H(X) + H(Y) \\
+&= H(X) + H(Y) - H(X,Y)
+\end{align}
+$$
+
+$$
+\begin{align}
+I(X; Y) &= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(\frac{p(x, y)}{p(x)p(y)}\right) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(p(x, y)\right) - \sum_{y \in Y} \sum_{x \in X} p(x, y) \log (p(x)) - \sum_{y \in Y} \sum_{x \in X} p(x, y)\log (p(y)) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(p(x, y)\right) - \sum_{x \in X} p(x) \log (p(x)) - \sum_{y \in Y} p(y)\log (p(y)) \\
+&= -H(X,Y) + H(X) + H(Y) \\
+&= H(X) + H(Y) - H(X,Y)
+\end{align}
+$$
+
+$$
+\begin{align}
+I(X; Y) &= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(\frac{p(x, y)}{p(x)p(y)}\right) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(\frac{p(x, y)}{p(x)}\right) - \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left( p(y) \right) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(\frac{p(y \mid x) p(x)}{p(x)}\right) + H(Y) \\
+&= \sum_{y \in Y} \sum_{x \in X} p(x, y) \log \left(p(y \mid x)\right) + H(Y) \\
+&= H(Y) - H(Y \mid X) \\
+&= H(X) - H(X \mid Y) \\
+\end{align}
+$$
+
+This code generates random variables with varying relationships and calculates both the Pearson correlation coefficient and mutual information for each pair. It then plots the results, coloring the points by the strength of the relationship as measured by each metric.
+
+```{r}
+if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages("ggplot2")
+if (!requireNamespace("infotheo", quietly = TRUE)) install.packages("infotheo")
+
+library(ggplot2)
+library(infotheo)
+```
+
+Define a function to simulate data and calculate correlation and MI. This function generates two random variables with a specified correlation using the Cholesky decomposition method.
+
+```{r}
+simulate_data <- function(n = 100, rho = 0.5) {
+  # Create covariance matrix based on rho
+  cov_matrix <- matrix(c(1, rho, rho, 1), byrow = TRUE, ncol = 2)
+  # Generate multivariate normal data
+  data <- MASS::mvrnorm(n = n, mu = c(0, 0), Sigma = cov_matrix)
+  # Calculate Pearson correlation
+  corr <- cor(data[,1], data[,2])
+  # Calculate mutual information
+  mi <- mutinformation(data[,1], data[,2], method = "emp")
+  return(list(data = data, correlation = corr, MI = mi))
+}
+```
+
+Now, simulate data at multiple levels of correlation and calculate MI for each. Store the results in a dataframe for plotting.
+
+```{r}
+set.seed(123) # For reproducibility
+# Define different levels of correlation
+rho_values <- seq(-0.9, 0.9, by = 0.2)
+results <- data.frame(rho = numeric(), correlation = numeric(), MI = numeric())
+
+for (rho in rho_values) {
+  sim_result <- simulate_data(n = 1000, rho = rho)
+  results <- rbind(results, data.frame(rho = rho, correlation = sim_result$correlation, MI = sim_result$MI))
+}
+```
+
+Finally, plot the calculated correlation and MI against the theoretical correlation, coloring the points by their strength.
+
+```{r}
+# Plotting
+ggplot(results, aes(x = rho, y = correlation, color = correlation)) +
+  geom_point(size = 5) +
+  geom_line(aes(y = correlation), color = "blue") +
+  labs(title = "Correlation and MI vs. Theoretical Correlation",
+       x = "Theoretical Correlation",
+       y = "Measured") +
+  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  geom_point(aes(x = rho, y = MI, color = MI), size = 5) +
+  geom_line(aes(x = rho, y = MI, color = MI), linetype = "dashed") +
+  theme_minimal()
+```
 
