@@ -1,0 +1,419 @@
+---
+title: "complex_contagion"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+The following rehearses Kenneth L. Cooke's Thresholded SEIR model from the book chapter "Functional-differential equations: some models and perturbation problems" (~1966)
+
+$$
+\begin{align*}
+S(t) &= \text{number of susceptible, unexposed individuals at time } t, \\
+E(t) &= \text{number of exposed but noninfectious individuals}, \\
+I(t) &= \text{number of infectious individuals}, \\
+R(t) &= \text{number of individuals recovered and not susceptible to infection}, \\
+C(t) &= \text{rate at which unexposed individuals receive first effective exposures}, \\
+\end{align*}
+$$
+
+That is, C(t) is the number of individuals receiving first exposures per unit time. It is clear that S + E + I + R is the constant total population. And initially S0 + I0 = N
+
+$$
+\frac{dS}{dt} = -C(t). \quad (5)
+$$
+
+Assume dose received in short time h is proportional to h and proportion of infectious individuals in environment
+
+$$
+\int_{\tau}^{t} \varrho (x) I(x) \, dx
+$$
+
+varrho(t) is a proportionality factor. An individual becomes infectious when
+
+$$
+\int_{\tau}^{t} \varrho (x) I(x) \, dx = m \quad(6)
+$$
+
+The rate C(t) of first exposures is proportional to number of contacts between S and I people.
+
+$$
+C(t) = r(t)S(t)I(t) \quad(7)
+$$
+
+where r(t) is a proportionality factor.
+
+Individuals recover after fixed time sigma.
+
+Initially
+
+$$
+S_0 + I_0 = N
+$$
+
+For a while, there are no new infections for interval $t_0$, defined by
+
+$$
+\int_{0}^{t_0} \varrho (x) I_0 \, dx = m
+$$
+
+For each t > t_0, there is a unique $\tau = \tau(t)$ that satisfies Eq. (6), since $\varrho(x) \geq 0 \,, I(x) > 0$
+
+Thus, individuals first exposed at t = 0 are infectious at $t_0$. Therefore
+
+$$
+dI/dt = 0, \,\,\, 0 \lt t \lt t_0
+$$
+
+The number of individuals becoming infective in [t, t+h] is equal to the number of first exposures in [$\tau(t)$, $\tau(t+h)$], which is
+
+$$
+\int_{\tau(t)}^{\tau(t+h)} C(u) \, du
+$$
+
+Until $t_0 + \sigma$, there are no recoveries. Therefore, rate of change in infectives is
+
+$$
+dI/dt = C(\tau(t) )\tau'(t) ,\,\,\,\,\, t_0 \lt t \lt t_0 + \sigma \quad (8)
+$$
+
+After some infectives recover, then
+
+$$
+dI/dt = C(\tau(t))\tau'(t) - C(\tau(t - \sigma))\tau'(t-\sigma) ,\,\,\,\,\, t \gt t_0 + \sigma \quad(9)
+$$
+
+(5)-(9) make up the model. Note that if constant time lag w between exposure and infection is assumed as in Wilson-Burke's model of insect plant feeding, we have
+
+$$
+dI/dt = C(t-w) - C(t-w-\sigma)
+$$
+
+which is the difference in first exposures between the first exposures after the time lag and the first exposures after the time lag and recovery period
+
+We can derive equations for S and tau only, as follows
+
+$$
+\begin{equation}
+S'(t) = -C(t) = -r(t)I_0S(t), \quad 0 < t < t_0. \quad(10)
+\end{equation}
+$$
+
+From Eq. (8) we have
+
+$$
+\begin{equation}
+I(t) = I_0 + \int_{t_0}^{t} C(\tau(t_1))\tau'(t_1) \, dt_1
+\end{equation}
+$$
+
+Using Eq. (5) we get
+
+$$
+\begin{equation}
+I(t) = I_0 + S_0 - S(\tau(t)), \quad t_0 < t < t_0 + \sigma.  \quad(11)
+\end{equation}
+$$
+
+Therefore Eqs. (5) and (7) yield
+
+$$
+\begin{equation}
+S'(t) = -r(t) S(t)[I_0 + S_0 - S(\tau(t))], \quad t_0 < t < t_0 + \sigma, \quad(12)
+\end{equation}
+$$
+
+where \(\tau(t)\) is the unique solution of Eq. (6), or of
+
+$$
+\begin{equation}
+- \int_{\tau(t)}^{t} \frac{\varrho(x) S'(x)}{r(x) S(x)} \, dx = m. \quad(13)
+\end{equation}
+$$
+
+In the same way, use of Eq. (9) instead of Eq. (8) yields
+
+$$
+\begin{equation}
+I(t) = I(t_0 + \sigma) + S(\tau(t_0 + \sigma)) - S(\tau(t_0)) - S(\tau(t)) + S(\tau(t - \sigma)), \quad t > t_0 + \sigma. \tag{14}
+\end{equation}
+$$
+
+and
+
+$$
+\begin{equation}
+S'(t) = -r(t) S(t)\left[I(t_0 + \sigma) + S(\tau(t_0 + \sigma)) - S(\tau(t_0)) - S(\tau(t)) + S(\tau(t - \sigma))\right], \quad t > t_0 + \sigma. \quad(15)
+\end{equation}
+$$
+
+First, S(t) is determined over $0 < t < t_0$ from eq. 10. then over $t_0 \lt t \lt t_0 + \sigma$ from eq. 12 and 13. The value of $I(t_0 + \sigma)$ can be found from Eq. 11 and then S(t) is determined for $t \gt t_0 + \sigma$ from eq. 13 and 15. Having r
+
+We can conclude with most important plain statement from this section of the chapters: "Thus, we see that there are at least three levels of complexity at which we can work: an ordinary differential equation, an equation with a lag which is a function of the unknown function, and an equation with a lag which is a functional of the history of the process." (p. 173)
+
+Let's implement this in code so we can plot it out.
+
+Let's start with a base SEIR model
+
+```{r}
+# SEIR model function
+seir_model <- function(S0, E0, I0, R0, beta, sigma, gamma, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    dE <- (beta * S[t] * I[t] / N - sigma * E[t]) * dt
+    dI <- (sigma * E[t] - gamma * I[t]) * dt
+    dR <- gamma * I[t] * dt
+    
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+days <- 200
+
+results <- seir_model(S0, E0, I0, R0, beta, sigma, gamma, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
+Then we can add a constant time lag as in Wilson-Burke. Call this time lag w.
+
+```{r}
+# SEIR model function
+seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    if (t <= w) {
+      dE <- (beta * S[t] * I[t] / N) * dt
+      dI <- (0 - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    else {
+      dE <- (beta * S[t] * I[t] / N - sigma * E[t-w]) * dt
+      dI <- (sigma * E[t - w] - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+w <- 100
+days <- 1000
+
+results <- seir_model_lag(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
+The difference between the constant time lag and the theory of the threshold model outlined above is the direct relationship between the proportion of infectious individuals and the rate at which exposures accumulated. In other words, the more infected individuals there are the faster a susceptible person crosses the threshold to become infected as well. 
+
+```{r}
+S0 <- 999
+I0 <- 1
+```
+
+Rate C(t) of first exposures is in Eq. (7). Let's set r(t) to a constant, as in usual SEIR models
+
+```{r}
+# r <- 0.01
+# C <- r * S * I
+```
+
+```{r}
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+days <- 100
+# Initialize vectors to store the compartment sizes over time
+S <- numeric(days)
+E <- numeric(days)
+C <- numeric(days)
+I <- numeric(days)
+R <- numeric(days)
+# Set initial values
+S[1] <- S0
+E[1] <- E0
+C[1] <- E0
+I[1] <- I0
+R[1] <- R0
+```
+
+
+```{r}
+# if (t < t0) {
+#   C_t <- r * I0 * S
+#   dS <- -C_t
+# } else if (t < t0 + sigma) {
+#   # You need to calculate tau(t) and its derivative tau'(t) here
+#   C_t <- r * (I0 + S0 - S) * S
+# } else {}
+```
+
+
+```{r}
+# SEIR model function
+seir_model <- function(S0, E0, I0, R0, beta, sigma, gamma, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    dE <- (beta * S[t] * I[t] / N - sigma * E[t]) * dt
+    dI <- (sigma * E[t] - gamma * I[t]) * dt
+    dR <- gamma * I[t] * dt
+    
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+days <- 300
+
+results <- seir_model(S0, E0, I0, R0, beta, sigma, gamma, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+
+```

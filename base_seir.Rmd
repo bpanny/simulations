@@ -1,0 +1,148 @@
+---
+title: "base_seir"
+author: "Benjamin Panny"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This code implements the SEIR model without `deSolve`
+
+```{r}
+# SEIR model function
+seir_model <- function(S0, E0, I0, R0, beta, sigma, gamma, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    dE <- (beta * S[t] * I[t] / N - sigma * E[t]) * dt
+    dI <- (sigma * E[t] - gamma * I[t]) * dt
+    dR <- gamma * I[t] * dt
+    
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+days <- 200
+
+results <- seir_model(S0, E0, I0, R0, beta, sigma, gamma, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
+Let's add a time lag w
+
+```{r}
+# SEIR model function
+seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    dE <- (beta * S[t] * I[t] / N - sigma * E[t]) * dt
+    if (t <= w) {
+      dI <- (0 - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    else {
+      dI <- (sigma * E[t - w] - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 1
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+w <- 15
+days <- 200
+
+results <- seir_model_lag(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+
+# Plotting
+if(interactive()){
+  plot(results$day, results$S, type = "l", col = "blue", ylim = c(0, S0 + I0), xlab = "Days", ylab = "Population", main = "SEIR Model")
+  lines(results$day, results$E, col = "orange")
+  lines(results$day, results$I, col = "red")
+  lines(results$day, results$R, col = "green")
+  legend("topright", legend = c("Susceptible", "Exposed", "Infectious", "Recovered"), col = c("blue", "orange", "red", "green"), lty = 1)
+}
+```
+```
+
+

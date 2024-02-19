@@ -1,0 +1,188 @@
+---
+title: "seir_constant_lag"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## R Markdown
+
+This first attempt is sorely mistaken but makes really cool plots!
+
+
+```{r}
+# SEIR model function
+seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step (in days)
+  
+  # Initialize vectors to store the compartment sizes over time
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  # Initialize vectors to store the compartment sizes over time
+  dS <- numeric(days)
+  dE_history <- numeric(days)
+  dI <- numeric(days)
+  dR <- numeric(days)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  dE_history[1] <- 0
+  I[1] <- I0
+  R[1] <- R0
+  
+  # Time loop
+  for(t in 1:(days-1)) {
+    dS <- -beta * S[t] * I[t] / N * dt
+    if (t <= w) {
+      dE <- (beta * S[t] * I[t] / N) * dt
+      dI <- (0 - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    else {
+      dE <- (beta * S[t] * I[t] / N - dE_history[(t-w)]) * dt
+      dI <- (dE_history[(t-w)] - gamma * I[t]) * dt
+      dR <- gamma * I[t] * dt
+    }
+    # Update states
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    dE_history[t] <- dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+# Example usage
+S0 <- 999
+E0 <- 0
+I0 <- 500
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/10
+w <- 10
+days <- 200
+
+results <- seir_model_lag(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
+
+```{r}
+seir_model_lag_corrected <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step
+  
+  # Initialize compartments
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Initialize change trackers
+  newE <- numeric(days)
+  
+  # Queue to manage the lag for E to I transition
+  E_to_I_queue <- rep(0, w + 1)
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  for(t in 1:(days-1)) {
+    # Calculate new exposures
+    newE[t] <- beta * S[t] * I[t] / N * dt
+    
+    # Update the queue for transitions from E to I
+    if (t >= w + 1) {
+      # Move individuals from E to I after lag
+      transitionEtoI <- E_to_I_queue[1] # Individuals transitioning today
+    } else {
+      transitionEtoI <- 0
+    }
+    
+    # Update compartments
+    dS <- -newE[t]
+    dE <- newE[t] - transitionEtoI
+    dI <- transitionEtoI - gamma * I[t] * dt
+    dR <- gamma * I[t] * dt
+    
+    # Apply updates
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+    
+    # Update the E_to_I_queue
+    E_to_I_queue <- c(E_to_I_queue[-1], newE[t]) # Remove the first element and append the new exposures
+    # unique, dengue, kenneth, add backwardsness, multiple Es from diff sources or same source
+    # Ensure no negative counts
+    # E[t+1] <- max(E[t+1], 0)
+    # I[t+1] <- max(I[t+1], 0)
+    E[t+1] <- E[t+1]
+    I[t+1] <- I[t+1]
+  }
+  
+  # Combine the results into a data frame
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 9999
+E0 <- 0
+I0 <- 500
+R0 <- 0
+beta <- 0.3
+sigma <- 1/5
+gamma <- 1/5
+w <- 0
+days <- 1000
+
+# Example usage with your parameters
+results <- seir_model_lag_corrected(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
