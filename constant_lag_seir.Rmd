@@ -72,8 +72,8 @@ R0 <- 0
 beta <- 0.3
 sigma <- 1/5
 gamma <- 1/10
-w <- 10
-days <- 200
+w <- 50
+days <- 1000
 
 results <- seir_model_lag(S0, E0, I0, R0, beta, sigma, gamma, w, days)
 
@@ -163,12 +163,102 @@ I0 <- 500
 R0 <- 0
 beta <- 0.3
 sigma <- 1/5
-gamma <- 1/5
-w <- 0
+gamma <- 1/10
+w <- 20
 days <- 1000
 
 # Example usage with your parameters
 results <- seir_model_lag_corrected(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+
+# Transform the data to long format
+results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
+
+# Adjust the Compartment variable to have a specific factor level for correct legend order
+results_long$Compartment <- factor(results_long$Compartment, levels = c("R", "I", "E", "S"))
+
+# Plot using ggplot
+ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
+  geom_line() +
+  scale_color_manual(values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green")) +
+  labs(x = "Days", y = "Population", title = "SEIR Model") +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  guides(color = guide_legend(reverse = TRUE))
+```
+
+```{r}
+seir_model_lag2 <- function(S0, E0, I0, R0, beta, sigma, w, days) {
+  N <- S0 + E0 + I0 + R0 # Total population
+  dt <- 1 # Time step
+  
+  # Initialize compartments
+  S <- numeric(days)
+  E <- numeric(days)
+  I <- numeric(days)
+  R <- numeric(days)
+  
+  # Initialize change trackers
+  newE <- numeric(days)
+  
+  # Queue to manage the lag for E to I transition
+  E_to_I_queue <- rep(0, w + 1)
+  
+  # Initialize the I to R queue with the initial infected, I0, appropriately placed
+  I_to_R_queue <- rep(0, sigma + 1)
+  I_to_R_queue[sigma + 1] <- I0 # Assume all initially infected will recover after sigma days
+  
+  # Set initial values
+  S[1] <- S0
+  E[1] <- E0
+  I[1] <- I0
+  R[1] <- R0
+  
+  for(t in 1:(days-1)) {
+    # Calculate new exposures
+    newE[t] <- beta * S[t] * I[t] / N * dt
+    
+    # Update compartments with transitions
+    transitionEtoI <- if(t > w) E_to_I_queue[1] else 0
+    transitionItoR <- I_to_R_queue[1]
+    
+    dS <- -newE[t]
+    dE <- newE[t] - transitionEtoI
+    dI <- transitionEtoI - transitionItoR
+    dR <- transitionItoR
+    
+    S[t+1] <- S[t] + dS
+    E[t+1] <- E[t] + dE
+    I[t+1] <- I[t] + dI
+    R[t+1] <- R[t] + dR
+    
+    # Update the queues
+    E_to_I_queue <- c(E_to_I_queue[-1], newE[t])
+    # Add the newly infected to the end of the I to R queue
+    I_to_R_queue <- c(I_to_R_queue[-1], transitionEtoI)
+    
+    # Ensure no negative counts in compartments
+    S[t+1] <- max(S[t+1], 0)
+    E[t+1] <- max(E[t+1], 0)
+    I[t+1] <- max(I[t+1], 0)
+    R[t+1] <- max(R[t+1], 0)
+  }
+  
+  results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
+  return(results)
+}
+
+# Example usage
+S0 <- 9999
+E0 <- 0
+I0 <- 500
+R0 <- 0
+beta <- 0.3
+sigma <- 50
+w <- 20
+days <- 1000
+
+# Example usage with your parameters
+results <- seir_model_lag2(S0, E0, I0, R0, beta, sigma, w, days)
 
 # Transform the data to long format
 results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")

@@ -1,0 +1,164 @@
+---
+title: "basics"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Matrix Addition
+
+Matrix addition is performed element-wise between two matrices of the same dimensions. If $A$ and $B$ are two matrices of size $m \times n$, their sum $C$ is also an $m \times n$ matrix where each element $c_{ij} = a_{ij} + b_{ij}$.
+
+$$
+C = A + B
+$$
+For example, if:
+
+$$
+A = \begin{pmatrix}
+1 & 2 \\
+3 & 4 \\
+\end{pmatrix}, \quad
+B = \begin{pmatrix}
+2 & 3 \\
+4 & 5 \\
+\end{pmatrix}
+$$
+
+Then
+
+$$
+C = \begin{pmatrix}
+1+2 & 2+3 \\
+3+4 & 4+5 \\
+\end{pmatrix} = \begin{pmatrix}
+3 & 5 \\
+7 & 9 \\
+\end{pmatrix}
+$$
+
+```{r}
+A <- matrix(c(1, 2, 3, 4), byrow = T, nrow = 2)
+B <- matrix(c(2, 3, 4, 5), byrow = T, nrow = 2)
+
+# Matrix Addition
+C <- A + B
+print(C)
+```
+
+# Matrix Multiplication
+Matrix multiplication involves the dot product of rows of the first matrix with columns of the second matrix. For two matrices $A$ of size $m \times n$ and $B$ of size $n \times p$, the product $AB$ will be of size $m \times p$ where each element $c_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}$.
+
+$$
+AB = C
+$$
+
+For example, if
+
+$$
+A = \begin{pmatrix}
+1 & 2 \\
+3 & 4 \\
+\end{pmatrix}, \quad
+B = \begin{pmatrix}
+2 & 0 \\
+1 & 2 \\
+\end{pmatrix}
+$$
+
+Then
+
+$$
+C = \begin{pmatrix}
+(1)(2)+(2)(1) & (1)(0)+(2)(2) \\
+(3)(2)+(4)(1) & (3)(0)+(4)(2) \\
+\end{pmatrix} = \begin{pmatrix}
+4 & 4 \\
+10 & 8 \\
+\end{pmatrix}
+$$
+
+```{r}
+A <- matrix(c(1,3,2,4), nrow=2)
+B <- matrix(c(2,1,0,2), nrow=2)
+C <- A %*% B
+print(C)
+```
+
+# Determinant
+
+The determinant of a matrix is a scalar value that can be computed from the elements of a square matrix and encodes certain properties of the matrix. For a 2x2 matrix:
+
+$$
+A = \begin{pmatrix}
+a & b \\
+c & d \\
+\end{pmatrix}
+$$
+
+The determinant of A is:
+
+$$
+\text{det}(A) = ad - bc 
+$$
+
+The determinant is important for understanding matrix invertibility; a matrix is invertible if and only if its determinant is non-zero.
+
+#Matrix Inversion
+
+Matrix inversion can be achieved through the method of minors and cofactors, as well as by Gauss-Jordan elimination. For a matrix $A$, its inverse $A^{-1}$ satisfies the equation $AA^{-1} = I$, where $I$ is the identity matrix.
+
+$$
+A^{-1} = \frac{1}{\text{det}(A)} \begin{pmatrix}
+d & -b \\
+-c & a \\
+\end{pmatrix}
+$$
+
+# Linear System of Equations
+
+A system of linear equations can be represented in matrix form as $Ax=b$, where 
+$A$ is a matrix of coefficients, $x$ is a column vector of variables, and $b$ is a column vector of results.
+
+$$
+Ax = b
+$$
+
+For example
+
+$$
+\begin{align*}
+x + 2y &= 5 \\
+3x + 4y &= 11
+\end{align*}
+$$
+
+```{r}
+eq1 <- function(x) { (5 - x) / 2 }
+eq2 <- function(x) { (11 - 3*x) / 4 }
+
+x_vals <- seq(-10, 10, length.out = 200)
+y_vals1 <- eq1(x_vals)
+y_vals2 <- eq2(x_vals)
+
+plot(x_vals, y_vals1, type='l', col='blue', ylim=c(-10, 10), ylab='y', xlab='x')
+lines(x_vals, y_vals2, col='red')
+legend("topright", legend=c("x + 2y = 5", "3x + 4y = 11"), col=c("blue", "red"), lty=1)
+```
+
+```{r}
+A <- matrix(c(1, 3, 2, 4), nrow=2)
+b <- c(5, 11)
+
+solution <- solve(A, b)
+
+plot(x_vals, y_vals1, type='l', col='blue', ylim=c(-10, 10), ylab='y', xlab='x')
+lines(x_vals, y_vals2, col='red')
+points(solution[1], solution[2], pch=19, col='green')
+legend("topright", legend=c("x + 2y = 5", "3x + 4y = 11", "Solution"), col=c("blue", "red", "green"), lty=1, pch=c(NA, NA, 19))
+```
+

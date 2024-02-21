@@ -230,16 +230,21 @@ ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
 Then we can add a constant time lag as in Wilson-Burke. Call this time lag w.
 
 ```{r}
-# SEIR model function
-seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
+seir_model_lag_corrected <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
   N <- S0 + E0 + I0 + R0 # Total population
-  dt <- 1 # Time step (in days)
+  dt <- 1 # Time step
   
-  # Initialize vectors to store the compartment sizes over time
+  # Initialize compartments
   S <- numeric(days)
   E <- numeric(days)
   I <- numeric(days)
   R <- numeric(days)
+  
+  # Initialize change trackers
+  newE <- numeric(days)
+  
+  # Queue to manage the lag for E to I transition
+  E_to_I_queue <- rep(0, w + 1)
   
   # Set initial values
   S[1] <- S0
@@ -247,25 +252,38 @@ seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
   I[1] <- I0
   R[1] <- R0
   
-  # Time loop
   for(t in 1:(days-1)) {
-    dS <- -beta * S[t] * I[t] / N * dt
-    if (t <= w) {
-      dE <- (beta * S[t] * I[t] / N) * dt
-      dI <- (0 - gamma * I[t]) * dt
-      dR <- gamma * I[t] * dt
-    }
-    else {
-      dE <- (beta * S[t] * I[t] / N - sigma * E[t-w]) * dt
-      dI <- (sigma * E[t - w] - gamma * I[t]) * dt
-      dR <- gamma * I[t] * dt
+    # Calculate new exposures
+    newE[t] <- beta * S[t] * I[t] / N * dt
+    
+    # Update the queue for transitions from E to I
+    if (t >= w + 1) {
+      # Move individuals from E to I after lag
+      transitionEtoI <- E_to_I_queue[1] # Individuals transitioning today
+    } else {
+      transitionEtoI <- 0
     }
     
-    # Update states
+    # Update compartments
+    dS <- -newE[t]
+    dE <- newE[t] - transitionEtoI
+    dI <- transitionEtoI - gamma * I[t] * dt
+    dR <- gamma * I[t] * dt
+    
+    # Apply updates
     S[t+1] <- S[t] + dS
     E[t+1] <- E[t] + dE
     I[t+1] <- I[t] + dI
     R[t+1] <- R[t] + dR
+    
+    # Update the E_to_I_queue
+    E_to_I_queue <- c(E_to_I_queue[-1], newE[t]) # Remove the first element and append the new exposures
+    # unique, dengue, kenneth, add backwardsness, multiple Es from diff sources or same source
+    # Ensure no negative counts
+    # E[t+1] <- max(E[t+1], 0)
+    # I[t+1] <- max(I[t+1], 0)
+    E[t+1] <- E[t+1]
+    I[t+1] <- I[t+1]
   }
   
   # Combine the results into a data frame
@@ -274,17 +292,18 @@ seir_model_lag <- function(S0, E0, I0, R0, beta, sigma, gamma, w, days) {
 }
 
 # Example usage
-S0 <- 999
+S0 <- 9999
 E0 <- 0
-I0 <- 1
+I0 <- 500
 R0 <- 0
 beta <- 0.3
 sigma <- 1/5
-gamma <- 1/10
-w <- 100
+gamma <- 1/5
+w <- 0
 days <- 1000
 
-results <- seir_model_lag(S0, E0, I0, R0, beta, sigma, gamma, w, days)
+# Example usage with your parameters
+results <- seir_model_lag_corrected(S0, E0, I0, R0, beta, sigma, gamma, w, days)
 
 # Transform the data to long format
 results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
@@ -311,58 +330,49 @@ I0 <- 1
 
 Rate C(t) of first exposures is in Eq. (7). Let's set r(t) to a constant, as in usual SEIR models
 
-```{r}
-# r <- 0.01
-# C <- r * S * I
-```
+We have
+
+$$
+\int_{0}^{t_0} \varrho (x) I_0 \, dx = m \quad (6)
+$$
+
+Let I0 = 1, let m = 10,
+
+$$
+\int_{0}^{t_0} \varrho (x) \, dx = 10 \\
+\text{Let } \varrho(x) = 1 \\
+\therefore t_0 = 10 \\
+\therefore dI/dt = 0, \quad 0 \lt t \lt 10
+$$
+
+We have 
+
+$$
+C(t) = r(t)S(t)I(t) \quad(7) \\ 
+\text{Let } r(t) = 0.03 \quad \forall t \\
+\therefore C(t) = 0.03 S(t) I(t)
+$$
 
 ```{r}
-# Example usage
-S0 <- 999
-E0 <- 0
-I0 <- 1
-R0 <- 0
-beta <- 0.3
-sigma <- 1/5
-gamma <- 1/10
-days <- 100
-# Initialize vectors to store the compartment sizes over time
-S <- numeric(days)
-E <- numeric(days)
-C <- numeric(days)
-I <- numeric(days)
-R <- numeric(days)
-# Set initial values
-S[1] <- S0
-E[1] <- E0
-C[1] <- E0
-I[1] <- I0
-R[1] <- R0
-```
-
-
-```{r}
-# if (t < t0) {
-#   C_t <- r * I0 * S
-#   dS <- -C_t
-# } else if (t < t0 + sigma) {
-#   # You need to calculate tau(t) and its derivative tau'(t) here
-#   C_t <- r * (I0 + S0 - S) * S
-# } else {}
-```
-
-
-```{r}
-# SEIR model function
-seir_model <- function(S0, E0, I0, R0, beta, sigma, gamma, days) {
+seir_model_lag2 <- function(S0, E0, I0, R0, beta, sigma, w, days) {
   N <- S0 + E0 + I0 + R0 # Total population
-  dt <- 1 # Time step (in days)
+  dt <- 1 # Time step
   
-  # Initialize vectors to store the compartment sizes over time
+  # Initialize compartments
   S <- numeric(days)
   E <- numeric(days)
   I <- numeric(days)
   R <- numeric(days)
+  
+  # Initialize change trackers
+  newE <- numeric(days)
+  
+  # Queue to manage the lag for E to I transition
+  E_to_I_queue <- rep(0, w + 1)
+  
+  # Initialize the I to R queue with the initial infected, I0, appropriately placed
+  I_to_R_queue <- rep(0, sigma + 1)
+  I_to_R_queue[sigma + 1] <- I0 # Assume all initially infected will recover after sigma days
   
   # Set initial values
   S[1] <- S0
@@ -370,36 +380,54 @@ seir_model <- function(S0, E0, I0, R0, beta, sigma, gamma, days) {
   I[1] <- I0
   R[1] <- R0
   
-  # Time loop
   for(t in 1:(days-1)) {
-    dS <- -beta * S[t] * I[t] / N * dt
-    dE <- (beta * S[t] * I[t] / N - sigma * E[t]) * dt
-    dI <- (sigma * E[t] - gamma * I[t]) * dt
-    dR <- gamma * I[t] * dt
+    # Calculate new exposures
+    newE[t] <- beta * S[t] * I[t] / N * dt
     
-    # Update states
+    # Update compartments with transitions
+    transitionEtoI <- if(t > w) E_to_I_queue[1] else 0
+    transitionItoR <- I_to_R_queue[1]
+    
+    dS <- -newE[t]
+    dE <- newE[t] - transitionEtoI
+    dI <- transitionEtoI - transitionItoR
+    dR <- transitionItoR
+    
     S[t+1] <- S[t] + dS
     E[t+1] <- E[t] + dE
     I[t+1] <- I[t] + dI
     R[t+1] <- R[t] + dR
+    
+    # Update the queues
+    E_to_I_queue <- c(E_to_I_queue[-1], newE[t])
+    # Add the newly infected to the end of the I to R queue
+    I_to_R_queue <- c(I_to_R_queue[-1], transitionEtoI)
+    
+    # Ensure no negative counts in compartments
+    S[t+1] <- max(S[t+1], 0)
+    E[t+1] <- max(E[t+1], 0)
+    I[t+1] <- max(I[t+1], 0)
+    R[t+1] <- max(R[t+1], 0)
   }
   
-  # Combine the results into a data frame
   results <- data.frame(day = 1:days, S = S, E = E, I = I, R = R)
   return(results)
 }
 
+
+
 # Example usage
 S0 <- 999
 E0 <- 0
-I0 <- 1
+I0 <- 10
 R0 <- 0
 beta <- 0.3
-sigma <- 1/5
-gamma <- 1/10
-days <- 300
+sigma <- 10
+w <- 20
+days <- 500
 
-results <- seir_model(S0, E0, I0, R0, beta, sigma, gamma, days)
+# Example usage with your parameters
+results <- seir_model_lag2(S0, E0, I0, R0, beta, sigma, w, days)
 
 # Transform the data to long format
 results_long <- pivot_longer(results, cols = c(S, E, I, R), names_to = "Compartment", values_to = "Count")
@@ -415,5 +443,5 @@ ggplot(results_long, aes(x = day, y = Count, color = Compartment)) +
   theme_minimal() +
   theme(legend.title = element_blank()) +
   guides(color = guide_legend(reverse = TRUE))
-
 ```
+
