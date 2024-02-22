@@ -2,7 +2,7 @@
 title: "Relationships among probability distributions"
 author: "Benjamin Panny"
 date: "`r Sys.Date()`"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -32,5 +32,34 @@ dat %>%
   pivot_longer(everything(), names_to = 'random_variable', values_to = "value") %>% 
   ggplot(aes(x = value, fill = random_variable)) +
   geom_density(alpha = .3)
+```
+
+$$
+\text{As } m \rightarrow \infty, \, Bin(n, p) \rightarrow_D N(np, np(1-p)) 
+$$
+
+```{r, cache = T}
+dat <- numeric(0)
+size <- numeric(0)
+for (n in 1:1000) {
+  dat <- c(dat, rbinom(n, 100, 0.5))
+  size <- c(size, rep(n, times = n))
+}
+dat <- tibble(x = dat, size = size)
+
+library(gganimate)
+# Assuming 'dat' is your data frame and already contains the 'size' and 'x' columns
+
+anim <- ggplot(dat %>% filter(between(size, 10, 310)), aes(x = x)) +
+    geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha = .5, fill = "skyblue", color = "black") + # Specify bins or binwidth
+    geom_function(fun = function(x) dnorm(x, mean = 50, sd = 5), color = "red") +
+    labs(title = "Sample Size of Binomial (10, 0.5): {closest_state}", x = "# Successes", y = "Density") +
+    transition_states(size, transition_length = 0.1, state_length = 1) +
+    enter_fade() + exit_shrink() +
+    ease_aes('linear')
+
+# Animate the plot
+animate(anim)
+anim_save('bin_to_normal.gif', animation=last_animation(), path=here::here('probability'))
 ```
 

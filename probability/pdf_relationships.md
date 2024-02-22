@@ -1,7 +1,7 @@
 Relationships among probability distributions
 ================
 Benjamin Panny
-2024-02-10
+2024-02-21
 
 <figure>
 <img
