@@ -162,3 +162,103 @@ points(solution[1], solution[2], pch=19, col='green')
 legend("topright", legend=c("x + 2y = 5", "3x + 4y = 11", "Solution"), col=c("blue", "red", "green"), lty=1, pch=c(NA, NA, 19))
 ```
 
+# Vector Combinations
+
+Vector Space and Linear Combinations
+A vector space is a collection of vectors that can be scaled and added together. A linear combination of a set of vectors ${v_1, v_2, \ldots, v_n}$ involves adding together these vectors, each multiplied by a scalar. This can be expressed as:
+
+$$
+c_1v_1 + c_2v_2 + \ldots + c_nv_n
+$$
+
+$c_1, c_2, \ldots c_n$ are scalars.
+
+For example, given vectors $v_1 = (2,3), \quad v_2 = (-1,2)$, find $v$ that is a linear combination of $v1$ and $v2$ such that $v = (0,8)$
+
+$$
+v = c_1v_1 + c_2v_2
+$$
+
+We need  t o solve for $c_1$ and $c_2$
+
+$$
+c_1(2, 3) + c_2(-1, 2) = (0, 8)
+$$
+
+Expanding the equation, we get:
+
+$$
+(2c_1 - c_2, 3c_1 + 2c_2) = (0, 8)
+$$
+
+Which is the system of equations:
+
+$$
+\begin{pmatrix}
+2  & -1  \\
+3 & 2 \\
+\end{pmatrix}
+\begin{pmatrix}
+c_1  \\
+c_2 \\
+\end{pmatrix}
+= 
+\begin{pmatrix}
+0  \\
+8 \\
+\end{pmatrix}
+$$
+
+```{r}
+A <- matrix(c(2, 3, -1, 2), nrow=2)
+b <- c(0, 8)
+
+solution <- solve(A, b)
+cat("c_1 =", solution[1], "c_2 =", solution[2], "\n")
+```
+
+To visualize the vectors \(v_1\), \(v_2\), and their linear combination \(v\), we use `ggplot2`. This visualization helps in understanding how the combination of \(v_1\) and \(v_2\) results in \(v\).
+
+```{r plot-vectors, fig.cap="Visualization of Vectors and Their Linear Combination"}
+library(ggplot2)
+
+# Define the original vectors and their combination
+v1 <- c(2, 3)
+v2 <- c(-1, 2)
+v <- solution[1] * v1 + solution[2] * v2
+
+# Create a data frame for plotting
+vectors_df <- data.frame(
+  x = c(0, 0, 0),
+  y = c(0, 0, 0),
+  xend = c(v1[1], v2[1], v[1]),
+  yend = c(v1[2], v2[2], v[2]),
+  color = c("v1", "v2", "v")
+)
+
+# Plot
+ggplot() +
+  geom_segment(data = vectors_df, aes(x = x, y = y, xend = xend, yend = yend, color = color), arrow = arrow(type = "closed")) +
+  scale_color_manual(values = c("v1" = "blue", "v2" = "red", "v" = "green")) +
+  labs(title = "Original Vectors", x = "X", y = "Y") +
+  theme_minimal()
+
+# Create a data frame for plotting
+vectors_df <- data.frame(
+  x = c(0, v1[1]*solution[1], 0),
+  y = c(0, v1[2]*solution[1], 0),
+  xend = c(v1[1]*solution[1], v1[1]*solution[1]+v2[1]*solution[2], v[1]),
+  yend = c(v1[2]*solution[1], v1[2]*solution[1]+v2[2]*solution[2], v[2]),
+  color = c("v1", "v2", "v")
+)
+
+ggplot() +
+  geom_segment(data = vectors_df, aes(x = x, y = y, xend = xend, yend = yend, color = color), arrow = arrow(type = "closed")) +
+  scale_color_manual(values = c("v1" = "blue", "v2" = "red", "v" = "green")) +
+  labs(title = "Combined Vectors", x = "X", y = "Y") +
+  theme_minimal()
+```
+
+This example demonstrates solving a vector combination problem by finding scalar multipliers that combine given vectors to result in a specific vector. The R code solves for the scalars and visualizes the vectors and their combination.
+
+Applications of vector combinations include solving systems of linear equations, transforming geometrical shapes in computer graphics, and modeling physical systems in engineering and physics. Linear combinations are also foundational in understanding vector spaces, subspaces, and spans in linear algebra.
