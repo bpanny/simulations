@@ -1,0 +1,679 @@
+---
+title: "Many Mathematical Functions"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Algebraic Functions
+
+Algebraic functions are functions that can be expressed as the solution of a polynomial equation with integer coefficients.
+
+## Polynomials: Can be generated solely by addition, multiplication, and raising to the power of a positive integer.
+
+As can be seen the below plots, the highest degree determines the characteristic shape of the plot!
+
+### Constant function: polynomial of degree zero, graph is a horizontal straight line
+
+```{r}
+ggplot(data.frame(x = c(-10, 10)), aes(x)) +
+  geom_line(aes(y = 5), color = "blue") +
+  ggtitle("Constant Function y=5") +
+  theme_minimal()
+```
+
+
+### Linear function: First degree polynomial, graph is a straight line.
+
+```{r}
+ggplot(data.frame(x = c(-10, 10)), aes(x)) +
+  geom_line(aes(y = 2*x + 3), color = "green") +
+  ggtitle("Linear Function y=2x+3") +
+  theme_minimal()
+```
+
+
+### Quadratic function: Second degree polynomial, graph is a parabola.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^2 - 4*x + 4), color = "red") +
+  ggtitle("Quadratic Function y=x^2-4x+4") +
+  theme_minimal()
+```
+
+
+### Cubic function: Third degree polynomial.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^3 - 6*x^2 + 11*x - 6), color = "purple") +
+  ggtitle("Cubic Function y=x^3-6x^2+11x-6") +
+  theme_minimal()
+```
+
+
+### Quartic function: Fourth degree polynomial.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^4 - 10*x^3 + 35*x^2 - 50*x + 24), color = "orange") +
+  ggtitle("Quartic Function y=x^4-10x^3+35x^2-50x+24") +
+  theme_minimal()
+```
+
+
+### Quintic function: Fifth degree polynomial.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^5 - 10*x^4 + 40*x^3 - 80*x^2 + 80*x - 32), color = "brown") +
+  ggtitle("Quintic Function y=x^5-10x^4+40x^3-80x^2+80x-32") +
+  theme_minimal()
+```
+
+
+### Sextic function: Sixth degree polynomial.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^6 - 6*x^5 + 15*x^4 - 20*x^3 + 15*x^2 - 6*x + 1), color = "cyan") +
+  ggtitle("Sextic Function y=x^6-6x^5+15x^4-20x^3+15x^2-6x+1") +
+  theme_minimal()
+```
+
+
+### Rational functions: A ratio of two polynomials.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = (x^2 + 2*x + 2) / (x^2 - 4)), color = "magenta") +
+  ggtitle("Rational Function y=(x^2+2x+2)/(x^2-4)") +
+  theme_minimal() +
+  ylim(-50, 50)
+```
+
+
+## nth root
+
+### Square root: Yields a number whose square is the given one.
+
+```{r}
+ggplot(data.frame(x = seq(0, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = sqrt(x)), color = "black") +
+  ggtitle("Square Root Function y=sqrt(x)") +
+  theme_minimal()
+```
+
+
+### Cube root: Yields a number whose cube is the given one.
+
+```{r}
+ggplot(data.frame(x = seq(-100, 100, length.out = 400)), aes(x = x)) +
+  geom_line(aes(y = sign(x) * abs(x)^(1/3)), color = "darkgreen") +
+  ggtitle("Cube Root Function y=cube root(x)") +
+  theme_minimal()
+```
+
+### Quartic root: Yields a number whose square is the given one.
+
+```{r}
+ggplot(data.frame(x = seq(0, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^(1/4)), color = "black") +
+  ggtitle("Quartic Root Function y=sqrt(x)") +
+  theme_minimal()
+```
+
+
+### Quintic root: Yields a number whose cube is the given one.
+
+```{r}
+ggplot(data.frame(x = seq(-100, 100, length.out = 400)), aes(x = x)) +
+  geom_line(aes(y = sign(x) * abs(x)^(1/5)), color = "darkgreen") +
+  ggtitle("Quintic Root Function y=cube root(x)") +
+  theme_minimal()
+```
+
+# Transcendental functions are functions that are not algebraic (non-polynomial)
+
+## Exponential function: raises a fixed number to a variable power.
+
+```{r}
+ggplot(data.frame(x = seq(-2, 2, length.out = 400)), aes(x)) +
+  geom_line(aes(y = exp(x)), color = "blue") +
+  ggtitle("Exponential Function y=exp(x)") +
+  theme_minimal()
+```
+
+## Hyperbolic functions: formally similar to the trigonometric functions.
+
+### Sine Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = sinh(x)), color = "blue") +
+  ggtitle("Hyperbolic Sine Function y=sinh(x)") +
+  theme_minimal()
+```
+
+### Cosine Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = cosh(x)), color = "red") +
+  ggtitle("Hyperbolic Cosine Function y=cosh(x)") +
+  theme_minimal()
+
+```
+
+### Tangent Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = tanh(x)), color = "green") +
+  ggtitle("Hyperbolic Tangent Function y=tanh(x)") +
+  theme_minimal()
+```
+
+
+
+## Inverse hyperbolic functions: inverses of the hyperbolic functions, analogous to the inverse circular functions.
+
+### Sine Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = asinh(x)), color = "blue") +
+  ggtitle("Inverse Hyperbolic Sine Function y=asinh(x)") +
+  theme_minimal()
+```
+
+### Cosine Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-5, 50, length.out = 400)), aes(x)) +
+  geom_line(aes(y = acosh(x)), color = "red") +
+  ggtitle("Inverse Hyperbolic Cosine Function y=acosh(x)") +
+  theme_minimal()
+```
+
+### Inverse Tangent Hyperbolic
+
+```{r}
+ggplot(data.frame(x = seq(-3, 3, length.out = 400)), aes(x)) +
+  geom_line(aes(y = atanh(x)), color = "green") +
+  ggtitle("Inverse Hyperbolic Tangent Function y=tanh(x)") +
+  theme_minimal()
+```
+
+## Logarithms: the inverses of exponential functions; useful to solve equations involving exponentials.
+
+### Natural logarithm
+
+```{r}
+ggplot(data.frame(x = seq(0.01, 5, length.out = 400)), aes(x)) +
+  geom_line(aes(y = log(x)), color = "red") +
+  ggtitle("Natural Logarithm y=log(x)") +
+  theme_minimal()
+```
+
+### Common logarithm
+
+```{r}
+ggplot(data.frame(x = seq(0.01, 5, length.out = 400)), aes(x)) +
+  geom_line(aes(y = log10(x)), color = "green") +
+  ggtitle("Common Logarithm y=log10(x)") +
+  theme_minimal()
+```
+
+### Binary logarithm
+
+```{r}
+ggplot(data.frame(x = seq(0.01, 5, length.out = 400)), aes(x)) +
+  geom_line(aes(y = log2(x)), color = "green") +
+  ggtitle("Common Logarithm y=log10(x)") +
+  theme_minimal()
+```
+
+## Power functions: raise a variable number to a fixed power; also known as Allometric functions; note: if the power is a rational number it is not strictly a transcendental function.
+
+
+```{r}
+ggplot(data.frame(x = seq(-5, 5, length.out = 400)), aes(x)) +
+  geom_line(aes(y = x^3), color = "green") +
+  ggtitle("y=x") +
+  theme_minimal()
+```
+
+## Periodic (Trignometric) functions: 
+
+c
+
+### Cotangent
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1/tan(x)), color = "blue") +
+  ggtitle("Cotangent Function y=cot(x)") +
+  theme_minimal() +
+  ylim(-10, 10)
+
+```
+
+### Secant
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1/cos(x)), color = "red") +
+  ggtitle("Secant Function y=sec(x)") +
+  theme_minimal() +
+  ylim(-10, 10)
+
+```
+
+### Cosecant
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1/sin(x)), color = "green") +
+  ggtitle("Cosecant Function y=csc(x)") +
+  theme_minimal() +
+  ylim(-10, 10)
+
+```
+
+### Exsecant
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1/cos(x) - 1), color = "purple") +
+  ggtitle("Exsecant Function y=exsec(x)") +
+  theme_minimal() +
+  ylim(-10, 10)
+
+```
+
+### Excosecant
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1/sin(x) - 1), color = "orange") +
+  ggtitle("Excosecant Function y=excsc(x)") +
+  theme_minimal() +
+  ylim(-10, 10)
+
+```
+
+### Versine
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1 - cos(x)), color = "cyan") +
+  ggtitle("Versine Function y=versin(x)") +
+  theme_minimal()
+
+```
+
+### Coversine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1 - sin(x)), color = "magenta") +
+  ggtitle("Coversine Function y=coversin(x)") +
+  theme_minimal()
+
+```
+
+### Vercosine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1 + cos(x)), color = "yellow") +
+  ggtitle("Vercosine Function y=vercosin(x)") +
+  theme_minimal()
+
+```
+
+### Covercosine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 1 + sin(x)), color = "black") +
+  ggtitle("Covercosine Function y=covercosin(x)") +
+  theme_minimal()
+
+```
+
+### Haversine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = (1 - cos(x))/2), color = "blue") +
+  ggtitle("Haversine Function y=haversin(x)") +
+  theme_minimal()
+
+```
+
+### Hacoversine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = (1 - sin(x))/2), color = "red") +
+  ggtitle("Hacoversine Function y=hacoversin(x)") +
+  theme_minimal()
+
+```
+
+### Havercosine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = (1 + cos(x))/2), color = "green") +
+  ggtitle("Havercosine Function y=havercosin(x)") +
+  theme_minimal()
+
+```
+
+### Hacovercosine 
+
+```{r}
+ggplot(data.frame(x = seq(-pi, 3*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = (1 + sin(x))/2), color = "purple") +
+  ggtitle("Hacovercosine Function y=hacovercosin(x)") +
+  theme_minimal()
+
+```
+
+## Inverse trigonometric functions etc.; used in geometry and to describe periodic phenomena. 
+
+### Inverse Sine (arcsin)
+
+```{r}
+ggplot(data.frame(x = seq(-2*pi, 2*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = asin(x)), color = "purple") +
+  ggtitle("Inverse Sine Function y=arcsin(x)") +
+  theme_minimal()
+```
+
+### Inverse Cosine (arccos) 
+
+```{r}
+ggplot(data.frame(x = seq(-2*pi, 2*pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = acos(x)), color = "orange") +
+  ggtitle("Inverse Cosine Function y=arccos(x)") +
+  theme_minimal()
+```
+
+### Inverse Tangent (arctan)
+
+```{r}
+ggplot(data.frame(x = seq(-pi, pi, length.out = 400)), aes(x)) +
+  geom_line(aes(y = atan(x)), color = "green") +
+  ggtitle("Inverse Tangent Function y=arctan(x)") +
+  theme_minimal() +
+  ylim(-10, 10)  # Limit y-axis to avoid extreme values near pi/2 and -pi/2
+```
+
+### Gudermannian function.
+
+The Gudermannian function relates the circular functions and the hyperbolic ones without involving complex numbers.
+
+```{r}
+ggplot(data.frame(x = seq(-10, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = 2*atan(exp(x)) - pi/2), color = "darkgreen") +
+  ggtitle("Gudermannian Function") +
+  theme_minimal()
+```
+
+# Special functions
+## Piecewise special functions
+### Indicator function: maps x to either 1 or 0, depending on whether or not x belongs to some subset. 
+The indicator function can be defined for a subset, such as x > 0.
+
+```{r}
+ggplot(data.frame(x = seq(-2, 2, length.out = 400)), aes(x)) +
+  geom_point(aes(y = ifelse(x > 0, 1, 0)), color = "blue") +
+  ggtitle("Indicator Function") +
+  theme_minimal()
+```
+
+### Step function: A finite linear combination of indicator  functions of half-open intervals.
+
+```{r}
+ggplot(data.frame(x = seq(-2, 2, length.out = 100)), aes(x)) +
+  geom_point(aes(y = ifelse(x > 0, 1, ifelse(x < -1, -1, 0))), color = "blue") +
+  ggtitle("Step Function") +
+  theme_minimal()
+```
+
+#### Heaviside step function: 0 for negative arguments and 1 for positive arguments. The integral of the Dirac delta function.
+
+```{r}
+ggplot(data.frame(x = seq(-2, 2, length.out = 400)), aes(x)) +
+  geom_point(aes(y = ifelse(x >= 0, 1, 0)), color = "red") +
+  ggtitle("Heaviside Step Function") +
+  theme_minimal()
+```
+
+### Sawtooth wave
+
+The sawtooth wave can be created using the modulo operation to repeat the pattern.
+
+```{r}
+ggplot() +
+  geom_function(fun = function(x) x - floor(x), aes(color = "green")) +
+  xlim(0, 10) +
+  ggtitle("Sawtooth Wave") +
+  theme_minimal()
+```
+
+### Square wave
+
+A square wave can alternate between -1 and 1. We use the modulo operation and ifelse for simplicity.
+
+```{r}
+ggplot(data.frame(x = seq(0, 10, length.out = 400)), aes(x)) +
+  geom_line(aes(y = ifelse(floor(x) %% 2 == 0, 1, -1)), color = "purple") +
+  ggtitle("Square Wave") +
+  theme_minimal()
+```
+
+### Triangle wave
+
+Similar to a sawtooth but with an absolute value to create a triangle shape.
+
+```{r}
+
+ggplot() +
+  geom_function(fun = function(x)  abs(1 - 2 * ((x - 0.5) %% 1)), color = "green") +
+  xlim(-5, 5) +
+  ggtitle("Triangle Wave") +
+  theme_minimal()
+```
+
+### Rectangular function
+
+```{r}
+ggplot(data.frame(x = seq(-2, 2, length.out = 400)), aes(x)) +
+  geom_line(aes(y = ifelse(x >= -1 & x <= 1, 1, 0)), color = "blue") +
+  ggtitle("Rectangular Function") +
+  theme_minimal()
+```
+
+### Floor function: Largest integer less than or equal to a given number.
+
+```{r}
+ggplot(data.frame(x = seq(-3, 3, length.out = 400)), aes(x)) +
+  geom_point(aes(y = floor(x)), color = "magenta") +
+  ggtitle("Floor Function") +
+  theme_minimal()
+```
+
+### Ceiling function: Smallest integer larger than or equal to a given number.
+
+```{r}
+ggplot(data.frame(x = seq(-3, 3, length.out = 400)), aes(x)) +
+  geom_point(aes(y = ceiling(x)), color = "magenta") +
+  theme_minimal()
+  ggtitle("Ceiling Function") +
+```
+
+### Sign function: Returns only the sign of a number, as +1 or −1.
+
+```{r}
+ggplot() +
+  geom_function(fun = function(x) sign(x), color = "blue") +
+  xlim(-10, 10) +
+  ggtitle("Sign Function") +
+  theme_minimal()
+```
+
+### Absolute value: distance to the origin (zero point)
+
+```{r}
+ggplot() +
+  geom_function(fun = function(x) abs(x), color = "red") +
+  xlim(-10, 10) +
+  ggtitle("Absolute Value") +
+  theme_minimal()
+```
+
+## Arithmetic functions
+
+### Sigma function: Sums of powers of divisors of a given natural number.
+
+The Sigma function, $\sigma_k(n)$ sums the $k^th$ powers of the divisors of $n$. Here is $\sigma_2(n)$, the squared sum of divisors
+
+```{r}
+sigma_function <- function(n) {
+  divisors <- seq(1, n)
+  sum(divisors[n %% divisors == 0])
+}
+
+ggplot(data.frame(x = seq(1, 1000, length.out = 1000)), aes(x)) +
+  geom_point(aes(y = sapply(x, sigma_function)), color = "magenta") +
+  theme_minimal() +
+  ggtitle("Sigma Function")
+```
+
+
+### Euler's totient function: Number of numbers coprime to (and not bigger than) a given one.
+
+```{r}
+euler_totient <- function(n) {
+  if (n == 1) return(1)
+  length(Filter(function(x) gcd(x, n) == 1, 1:n))
+}
+
+# Example: Compute Euler's totient function for numbers 1 to 10
+sapply(1:10, euler_totient)
+```
+
+### Prime-counting function: Number of primes less than or equal to a given number.
+### Partition function: Order-independent count of ways to write a given positive integer as a sum of positive integers.
+### Möbius μ function: Sum of the nth primitive roots of unity, it depends on the prime factorization of n.
+### Prime omega functions
+### Chebyshev functions
+### Liouville function, λ(n) = (–1)Ω(n)
+### Von Mangoldt function, Λ(n) = log p if n is a positive power of the prime p
+### Carmichael function
+
+## Antiderivatives of elementary functions
+### Logarithmic integral function: Integral of the reciprocal of ## the logarithm, important in the prime number theorem.
+### Exponential integral
+### Trigonometric integral: Including Sine Integral and Cosine ## Integral
+### Inverse tangent integral
+### Error function: An integral important for normal random variables.
+#### Fresnel integral: related to the error function; used in optics.
+#### Dawson function: occurs in probability.
+#### Faddeeva function
+## Gamma and related functions
+## Gamma function: A generalization of the factorial function.
+## Barnes G-function
+## Beta function: Corresponding binomial coefficient analogue.
+## Digamma function, Polygamma function
+## Incomplete beta function
+## Incomplete gamma function
+## K-function
+## Multivariate gamma function: A generalization of the Gamma ## function useful in multivariate statistics.
+## Student's t-distribution
+## Pi function 
+## Elliptic and related functions
+## Elliptic integrals: Arising from the path length of ellipses; ## important in many applications. Alternate notations include:
+## Carlson symmetric form
+## Legendre form
+## Nome
+## Quarter period
+## Elliptic functions: The inverses of elliptic integrals; used ## to model double-periodic phenomena.
+## Jacobi's elliptic functions
+## Weierstrass's elliptic functions
+## Lemniscate elliptic functions
+## Theta functions
+## Neville theta functions
+## Modular lambda function
+## Closely related are the modular forms, which include
+## J-invariant
+## Dedekind eta function
+## Bessel and related functions
+## Airy function
+## Bessel functions: Defined by a differential equation; useful ## in astronomy, electromagnetism, and mechanics.
+## Bessel–Clifford function
+## Kelvin functions
+## Legendre function: From the theory of spherical harmonics.
+## Scorer's function
+## Sinc function
+## Hermite polynomials
+## Laguerre polynomials
+## Chebyshev polynomials
+## Synchrotron function
+## Riemann zeta and related functions
+## Riemann zeta function: A special case of Dirichlet series.
+## Riemann Xi function
+## Dirichlet eta function: An allied function.
+## Dirichlet beta function
+## Dirichlet L-function
+## Hurwitz zeta function
+## Legendre chi function
+## Lerch transcendent
+## Polylogarithm and related functions:
+## Incomplete polylogarithm
+## Clausen function
+## Complete Fermi–Dirac integral, an alternate form of the ## polylogarithm.
+## Dilogarithm
+## Incomplete Fermi–Dirac integral
+## Kummer's function
+## Riesz function
+## Hypergeometric and related functions
+## Hypergeometric functions: Versatile family of power series.
+## Confluent hypergeometric function
+## Associated Legendre functions
+## Meijer G-function
+## Fox H-function
+## Iterated exponential and related functions
+## Hyper operators
+## Iterated logarithm
+## Pentation
+## Super-logarithms
+## Super-roots
+## Tetration
+## Other standard special functions
+## Lambert W function: Inverse of f(w) = w exp(w).
+## Lamé function
+## Mathieu function
+## Mittag-Leffler function
+## Painlevé transcendents
+## Parabolic cylinder function
+## Arithmetic–geometric mean
+## Miscellaneous functions
+## Ackermann function: in the theory of computation, a ## computable function that is not primitive recursive.
+## Dirac delta function: everywhere zero except for x = 0; total ## integral is 1. Not a function but a distribution, but ## sometimes informally referred to as a function, particularly ## by physicists and engineers.
+## Dirichlet function: is an indicator function that matches 1 ## to rational numbers and 0 to irrationals. It is nowhere ## continuous.
+## Thomae's function: is a function that is continuous at all ## irrational numbers and discontinuous at all rational numbers. ## It is also a modification of Dirichlet function and sometimes ## called Riemann function.
+## Kronecker delta function: is a function of two variables, ## usually integers, which is 1 if they are equal, and 0 ## otherwise.
+## Minkowski's question mark function: Derivatives vanish on the ## rationals.
+## Weierstrass function: is an example of continuous function ## that is nowhere differentiable
