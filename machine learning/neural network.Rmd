@@ -1,0 +1,962 @@
+---
+title: "Mathematical Report on a Simple Neural Network"
+author: "Your Name"
+date: "2024-02-25"
+output: html_document
+---
+
+# Introduction
+
+Neural networks are a cornerstone of machine learning, enabling computers to learn from observational data. This report provides an overview of a simple neural network, including its architecture, mathematical foundations, and an example implemented in R.
+
+# Neural Network Architecture
+
+A simple neural network consists of an input layer, one or more hidden layers, and an output layer. Each layer contains neurons (nodes) that are connected to neurons in the next layer. These connections have associated weights that are adjusted during training.
+
+## Architecture Diagram
+
+*Include a diagram of the neural network architecture here.*
+
+# Derivation of the Sigmoid Function's Derivative
+
+The sigmoid function, a common activation function in neural networks, is defined as:
+
+$$
+\sigma(x) = \frac{1}{1 + e^{-x}}
+$$
+
+To find the derivative of the sigmoid function, $\frac{d\sigma(x)}{dx}$, we start by applying the quotient rule of differentiation, which is given by:
+
+$$
+\left( \frac{f}{g} \right)' = \frac{f'g - fg'}{g^2}
+$$
+
+In our case, $f(x) = 1$ and $g(x) = 1 + e^{-x}$, hence $f'(x) = 0$ and $g'(x) = -e^{-x}$.
+
+Substituting these into the quotient rule formula gives:
+
+$$
+\frac{d\sigma(x)}{dx} = \frac{0 \cdot (1 + e^{-x}) - 1 \cdot (-e^{-x})}{(1 + e^{-x})^2}
+$$
+
+Simplifying the above expression, we get:
+
+$$
+\frac{d\sigma(x)}{dx} = \frac{e^{-x}}{(1 + e^{-x})^2}
+$$
+
+We can then express $e^{-x}$ in terms of the sigmoid function itself, noticing that:
+
+$$
+e^{-x} = \frac{1}{\sigma(x)} - 1
+$$
+
+Therefore, the derivative simplifies to:
+
+$$
+\frac{d\sigma(x)}{dx} = \sigma(x)^2 \times (\frac{1}{\sigma(x)} - 1)
+$$
+
+Which can be re-written as:
+
+$$
+\frac{d\sigma(x)}{dx} = \sigma(x) \cdot (1 - \sigma(x)) = \sigma(x) - \sigma(x)^2
+$$
+
+This final expression shows that the derivative of the sigmoid function can be expressed in terms of the function itself, which is a neat property that makes it computationally efficient for use in neural networks.
+
+# Simple Neural Network Equivalent to Linear Regression
+
+A simple neural network that is equivalent to a linear regression model can be structured as follows:
+
+- **Input Layer**: Consists of neurons equal to the number of features (predictors) in the dataset. For a dataset with $n$ features, there will be $n$ input neurons.
+
+- **Output Layer**: Contains a single neuron, as linear regression predicts a single continuous value. This neuron does not apply any non-linear activation function. Instead, it uses a linear activation function, which means the output is a linear combination of the inputs.
+
+## Network Architecture
+
+The architecture can be visualized as follows:
+
+1. Each input neuron receives an input feature.
+2. The output neuron computes a weighted sum of these inputs, adds a bias term, and outputs the result.
+
+Mathematically, if we have inputs $x_1, x_2, ..., x_n$ and their corresponding weights $w_1, w_2, ..., w_n$ with a bias term $b$, the output $y$ is given by:
+
+$$
+y = w_1x_1 + w_2x_2 + ... + w_nx_n + b
+$$
+
+This equation is identical to the formula used in linear regression, where $y$ is the predicted value.
+
+## Learning Process
+
+The learning process involves adjusting the weights ($w_1, w_2, ..., w_n$) and the bias ($b$) based on the difference between the predicted output and the actual output (known as the error). This process is typically performed using gradient descent or other optimization techniques to minimize a loss function, such as Mean Squared Error (MSE), which is also common in linear regression.
+
+## Mathematical Details of the Learning Process
+
+The objective of the learning process in a neural network or a linear regression model is to find the set of parameters (weights and bias) that minimize the loss function. For both, a common choice of loss function is the Mean Squared Error (MSE), which is defined as:
+
+$$
+\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+$$
+
+Where:
+
+- $N$ is the number of observations in the dataset.
+- $y_i$ is the actual value of the $i$th observation.
+- $\hat{y}_i$ is the predicted value for the $i$th observation, given by the model's output: $\hat{y}_i = w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b$.
+
+### Gradient Descent
+
+Gradient Descent is an optimization algorithm used to minimize the loss function by iteratively moving towards the minimum of the loss function. The parameters are updated in the opposite direction of the gradient of the loss function with respect to the parameters.
+
+#### Weight Update Rule
+
+The weights are updated by subtracting the derivative of the loss function with respect to each weight. The update rule for a weight $w_j$ can be expressed as:
+
+$$
+w_j := w_j - \alpha \frac{\partial \text{MSE}}{\partial w_j}
+$$
+
+Where $\alpha$ is the learning rate, a hyperparameter that determines the size of the steps taken during optimization.
+
+The partial derivative of the MSE with respect to $w_j$ is given by:
+
+$$
+\frac{\partial \text{MSE}}{\partial w_j} = \frac{2}{N} \sum_{i=1}^{N} -x_{ij} (y_i - \hat{y}_i)
+$$
+
+#### Bias Update Rule
+
+Similarly, the bias is updated by subtracting the derivative of the loss function with respect to the bias:
+
+$$
+b := b - \alpha \frac{\partial \text{MSE}}{\partial b}
+$$
+
+The partial derivative of the MSE with respect to the bias $b$ is:
+
+$$
+\frac{\partial \text{MSE}}{\partial b} = \frac{2}{N} \sum_{i=1}^{N} -(y_i - \hat{y}_i)
+$$
+
+### Detailed Partial Derivative Calculations
+
+#### Partial Derivative with Respect to Weights
+
+The partial derivative of the MSE loss function with respect to a weight $w_j$ captures how changes in $w_j$ affect the loss. Starting from the MSE formula:
+
+$$
+\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+$$
+
+And recalling that $\hat{y}_i = w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b$, we substitute $\hat{y}_i$ into the MSE equation:
+
+$$
+\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - (w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b))^2
+$$
+
+Taking the partial derivative of MSE with respect to $w_j$ involves applying the chain rule of calculus, which gives:
+
+$$
+\frac{\partial \text{MSE}}{\partial w_j} = \frac{2}{N} \sum_{i=1}^{N} (-(y_i - \hat{y}_i) \cdot x_{ij})
+$$
+
+This equation results from differentiating the squared term $(y_i - \hat{y}_i)^2$ to get $2(y_i - \hat{y}_i)$ and then applying the chain rule to get the derivative of the inner function $(y_i - \hat{y}_i)$ with respect to $w_j$, which is $-x_{ij}$ because the derivative of $w_jx_{ij}$ with respect to $w_j$ is $x_{ij}$, and the negative sign comes from the subtraction.
+
+#### Partial Derivative with Respect to Bias
+
+The bias $b$ functions similarly to a weight associated with an input of 1. Hence, the partial derivative of MSE with respect to $b$ can be derived using a similar approach but without the multiplication by $x_{ij}$, as the "input" for bias in the model is implicitly considered as 1 for all observations. Therefore:
+
+$$
+\frac{\partial \text{MSE}}{\partial b} = \frac{2}{N} \sum_{i=1}^{N} -(y_i - \hat{y}_i)
+$$
+
+This derivative signifies how the MSE loss changes with respect to the bias $b$. Essentially, it indicates the direction and magnitude by which the bias should be adjusted to reduce the error.
+
+### Gradient Descent Update Rules Revisited
+
+With these derivatives, the update rules for $w_j$ and $b$ during each iteration of gradient descent become:
+
+- For weights $w_j$:
+
+$$
+w_j := w_j - \alpha \left(\frac{2}{N} \sum_{i=1}^{N} -(y_i - \hat{y}_i) \cdot x_{ij}\right)
+$$
+
+- For bias $b$:
+
+$$
+b := b - \alpha \left(\frac{2}{N} \sum_{i=1}^{N} -(y_i - \hat{y}_i)\right)
+$$
+
+Where $\alpha$ is the learning rate, a critical hyperparameter that controls the size of the steps taken towards the minimum of the loss function.
+
+By iteratively applying these update rules, the model learns the optimal set of weights and bias that minimize the MSE, effectively training the neural network or linear regression model to fit the data.
+
+### Optimization Process
+
+1. **Initialization**: Begin with random values for the weights and bias.
+2. **Iteration**: For each epoch (a complete pass through the dataset), perform the following steps:
+   - Compute the output $\hat{y}_i$ for each observation using the current weights and bias.
+   - Calculate the gradient of the loss function with respect to each parameter (weights and bias).
+   - Update the weights and bias according to the update rules.
+3. **Convergence**: Repeat the iteration step until the loss function converges to a minimum or a predefined number of epochs is reached.
+
+This iterative process of adjusting the weights and bias to minimize the MSE loss function is central to the training of both neural networks and linear regression models, facilitating the learning of the underlying patterns in the data.
+
+### Learning Process Using Stochastic Gradient Descent (SGD)
+
+Stochastic Gradient Descent (SGD) modifies the traditional Gradient Descent optimization by updating the model's parameters based on the gradient of the loss function computed from a single randomly selected data point (or a small batch of data points) at each iteration. This approach is particularly useful for large datasets, as it significantly reduces the computational burden at each step.
+
+#### Optimization Process with SGD
+
+1. **Initialization**: Start with random values for the weights ($w_1, w_2, ..., w_n$) and the bias ($b$).
+
+2. **Iteration**: Unlike Gradient Descent, which uses the entire dataset to compute the gradient, SGD iterates through the dataset one data point (or a small batch) at a time. For each epoch (a complete pass through the dataset), perform the following steps for each sample or small batch of samples:
+
+    a. **Compute the Output**: Calculate the predicted output $\hat{y}_i$ for the current data point using the current weights and bias.
+
+    b. **Calculate the Gradient**: Compute the gradient of the loss function with respect to each parameter (weights and bias) using just the current data point (or batch). The formulas for the partial derivatives remain the same, but they are computed using the loss from a single observation (or average loss from a small batch) rather than the average loss over the entire dataset.
+
+    c. **Update the Parameters**: Adjust the weights and bias according to the update rules, using the gradients computed from the current sample or batch:
+
+    - For weights $w_j$:
+
+    $$
+    w_j := w_j - \alpha \left(-(y_i - \hat{y}_i) \cdot x_{ij}\right)
+    $$
+
+    - For bias $b$:
+
+    $$
+    b := b - \alpha \left(-(y_i - \hat{y}_i)\right)
+    $$
+
+    Where $\alpha$ is the learning rate. Note that in SGD, the update is performed after each data point (or batch), significantly increasing the frequency of updates compared to batch gradient descent.
+
+3. **Convergence**: Repeat the iteration steps, passing through the dataset multiple times (each pass is an epoch), until the loss function converges to a minimum or a predefined number of epochs is reached. Due to the stochastic nature of the algorithm, the loss might not decrease monotonically after each update but should trend downward over many epochs.
+
+#### Advantages of SGD
+
+- **Efficiency**: SGD can be faster than batch gradient descent for large datasets because it updates the parameters more frequently.
+- **Convergence**: For certain types of non-convex loss functions, SGD can help avoid local minima, potentially leading to better solutions.
+
+#### Considerations
+
+- **Variance in Updates**: The updates can be noisy due to the stochastic nature of the algorithm, which might require a carefully chosen decreasing learning rate schedule to ensure convergence.
+- **Hyperparameter Tuning**: The learning rate and the batch size (if using mini-batch SGD) are crucial hyperparameters that can affect the convergence and final model performance.
+
+SGD offers a practical and efficient way to train neural networks and linear regression models, especially when dealing with large volumes of data. By adjusting the model parameters iteratively based on a subset of the data at each step, SGD facilitates faster learning while still guiding the model towards the optimal set of parameters.
+
+## Conclusion
+
+By using a simple neural network with a linear activation function and no hidden layers, we effectively create a model that performs linear regression. The network learns to predict the output by linearly combining the inputs, mirroring the process and objective of linear regression.
+
+# Simple Neural Network Equivalent to Logistic Regression
+
+A simple neural network that functions equivalently to a logistic regression model can be described as follows:
+
+## Network Structure
+
+- **Input Layer**: Comprises neurons equal to the number of features (predictors) in the dataset. If there are $n$ features, then there will be $n$ input neurons.
+
+- **Output Layer**: Contains a single neuron. This neuron applies the sigmoid activation function to the linear combination of inputs, producing an output value between 0 and 1. The sigmoid function is defined as $\sigma(z) = \frac{1}{1 + e^{-z}}$, where $z$ is the linear combination of the inputs and the bias term.
+
+## Mathematical Model
+
+Given inputs $x_1, x_2, ..., x_n$ with corresponding weights $w_1, w_2, ..., w_n$ and a bias term $b$, the output $y$ (prediction) of the neural network is calculated as follows:
+
+1. Compute the linear combination of inputs and weights, plus the bias:
+
+$$
+z = w_1x_1 + w_2x_2 + ... + w_nx_n + b
+$$
+
+2. Apply the sigmoid activation function to $z$ to get the output $y$:
+
+$$
+y = \sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+
+This output $y$ represents the probability that the given input belongs to the positive class (usually labeled as "1").
+
+## Learning Process
+
+The learning process involves adjusting the weights ($w_1, w_2, ..., w_n$) and bias ($b$) to minimize a loss function that quantifies the difference between the predicted probabilities and the actual class labels. The loss function commonly used in logistic regression is the binary cross-entropy (log loss), defined as:
+
+$$
+L = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]
+$$
+
+Where:
+
+- $N$ is the number of observations.
+- $y_i$ is the actual class label of the $i$th observation.
+- $\hat{y}_i$ is the predicted probability for the $i$th observation.
+
+The weights and bias are updated using an optimization algorithm such as Gradient Descent or its variants (e.g., Stochastic Gradient Descent), aiming to minimize the loss function.
+
+### Update Rules and Partial Derivatives in Logistic Regression Neural Network
+
+For a neural network equivalent to logistic regression, the binary cross-entropy loss function is given by:
+
+$$
+L = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]
+$$
+
+Where:
+
+- $N$ is the number of observations.
+- $y_i$ is the actual class label of the $i$th observation.
+- $\hat{y}_i$ is the predicted probability for the $i$th observation, computed as $\hat{y}_i = \sigma(z_i)$ with $\sigma(z_i) = \frac{1}{1 + e^{-z_i}}$ and $z_i = w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b$.
+
+#### Gradient Descent Update Rules
+
+The goal is to find the gradients of the loss function with respect to each weight $w_j$ and the bias $b$, and use these gradients to update the parameters.
+
+# Detailed Chain Rule Application in Logistic Regression Neural Network
+
+The process of updating the weights and bias in logistic regression (or its neural network equivalent) through gradient descent involves computing the partial derivatives of the loss function with respect to each parameter. Here, we'll detail the chain rule application step by step for both weights ($w_j$) and bias ($b$).
+
+## Binary Cross-Entropy Loss Function
+
+The binary cross-entropy loss for a single observation is:
+
+$$
+L_i = -[y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]
+$$
+
+Where:
+
+- $y_i$ is the actual class label (0 or 1).
+- $\hat{y}_i$ is the predicted probability, $\hat{y}_i = \sigma(z_i) = \frac{1}{1 + e^{-z_i}}$.
+- $z_i = w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b$ is the input to the sigmoid function.
+
+## Applying the Chain Rule
+
+The goal is to compute $\frac{\partial L_i}{\partial w_j}$ and $\frac{\partial L_i}{\partial b}$.
+
+### Step 1: Derivative of Loss $L_i$ with Respect to Prediction $\hat{y}_i$
+
+First, we differentiate the loss function with respect to $\hat{y}_i$:
+
+$$
+\frac{\partial L_i}{\partial \hat{y}_i} = -\left(\frac{y_i}{\hat{y}_i} - \frac{1 - y_i}{1 - \hat{y}_i}\right)
+$$
+
+This step follows directly from applying the derivative rules for logarithmic functions.
+
+### Step 2: Derivative of Prediction $\hat{y}_i$ with Respect to Input $z_i$
+
+Next, we find the derivative of the sigmoid function (our prediction $\hat{y}_i$) with respect to its input $z_i$:
+
+$$
+\frac{\partial \hat{y}_i}{\partial z_i} = \sigma(z_i) (1 - \sigma(z_i)) = \hat{y}_i (1 - \hat{y}_i)
+$$
+
+This result utilizes the known derivative of the sigmoid function.
+
+### Step 3: Derivative of Input $z_i$ with Respect to Weights $w_j$ and Bias $b$
+
+Finally, we differentiate $z_i$ with respect to $w_j$ and $b$:
+
+- For $w_j$: $\frac{\partial z_i}{\partial w_j} = x_{ij}$
+- For $b$: $\frac{\partial z_i}{\partial b} = 1$
+
+### Chain Rule Application
+
+#### For Weights $w_j$
+
+Combining the above steps using the chain rule gives:
+
+$$
+\frac{\partial L_i}{\partial w_j} = \frac{\partial L_i}{\partial \hat{y}_i} \cdot \frac{\partial \hat{y}_i}{\partial z_i} \cdot \frac{\partial z_i}{\partial w_j} = -\left(\frac{y_i}{\hat{y}_i} - \frac{1 - y_i}{1 - \hat{y}_i}\right) \cdot \hat{y}_i(1 - \hat{y}_i) \cdot x_{ij}
+$$
+
+Simplifying, we get:
+
+$$
+(-y_i/\hat{y_i} + \frac{1-y_i}{1-\hat{y_i}})\hat {y_i}(1-\hat{y_i})x_{ij} \\
+= (-y_i(1-\hat{y_i})+\hat{y_i}(1-y_i))x_{ij} \\
+= (-y_i + y_i\hat{y_i} + \hat{y_i} - y_i\hat{y_i})x_{ij} \\
+=-(y_i - \hat{y_i})x_{ij} \\
+\frac{\partial L_i}{\partial w_j} = ( \hat{y}_i - y_i ) x_{ij}
+$$
+
+#### For Bias $b$
+
+Similarly, for the bias:
+
+$$
+\frac{\partial L_i}{\partial b} = \frac{\partial L_i}{\partial \hat{y}_i} \cdot \frac{\partial \hat{y}_i}{\partial z_i} \cdot \frac{\partial z_i}{\partial b} = -\left(\frac{y_i}{\hat{y}_i} - \frac{1 - y_i}{1 - \hat{y}_i}\right) \cdot \hat{y}_i(1 - \hat{y}_i) \cdot 1
+$$
+
+Which simplifies to:
+
+$$
+\frac{\partial L_i}{\partial b} = ( \hat{y}_i - y_i )
+$$
+
+## Update Rules
+
+Given these derivatives, the parameters are updated as follows:
+
+- For weights $w_j$: $w_j := w_j - \alpha \frac{\partial L}{\partial w_j}$
+- For bias $b$: $b := b - \alpha \frac{\partial L}{\partial b}$
+
+Where $\alpha$ is the learning rate. These updates are performed iteratively to minimize the loss function and train the model.
+
+
+### Update Rules and Partial Derivatives in Logistic Regression Neural Network
+
+For a neural network equivalent to logistic regression, the binary cross-entropy loss function is given by:
+
+$$
+L = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)]
+$$
+
+Where:
+
+- $N$ is the number of observations.
+- $y_i$ is the actual class label of the $i$th observation.
+- $\hat{y}_i$ is the predicted probability for the $i$th observation, computed as $\hat{y}_i = \sigma(z_i)$ with $\sigma(z_i) = \frac{1}{1 + e^{-z_i}}$ and $z_i = w_1x_{i1} + w_2x_{i2} + ... + w_nx_{in} + b$.
+
+#### Gradient Descent Update Rules
+
+The goal is to find the gradients of the loss function with respect to each weight $w_j$ and the bias $b$, and use these gradients to update the parameters.
+
+#### Update Rules
+
+Given the gradients, the update rules for each parameter using a learning rate $\alpha$ are:
+
+- For weights $w_j$:
+
+$$
+w_j := w_j - \alpha \frac{\partial L}{\partial w_j} \\
+w_j := w_j - \alpha \left( \sum_{i=1}^{N} ( \hat{y}_i - y_i ) x_{ij} \right)
+$$
+
+- For bias $b$:
+
+$$
+b := b - \alpha \frac{\partial L}{\partial b} \\
+b := b - \alpha \left( \sum_{i=1}^{N} ( \hat{y}_i - y_i ) \right)
+$$
+
+### Iterative Optimization
+
+The parameters are updated iteratively using these rules for each epoch, or pass through the dataset, until convergence criteria are met (e.g., the change in loss between epochs is below a threshold or a maximum number of epochs is reached).
+
+This process effectively minimizes the binary cross-entropy loss, adjusting the model's weights and bias to better fit the logistic regression model to the data for binary classification tasks.
+
+
+## Conclusion
+
+By structuring a simple neural network with a sigmoid activation function and optimizing it using binary cross-entropy as the loss function, we create a model that performs logistic regression. This model learns to classify inputs into binary categories, mirroring the logistic regression approach but within the neural network framework.
+
+# Simple Neural Network for Multi-Class Classification
+
+A simple neural network designed for multi-class classification can be structured as follows:
+
+## Network Structure
+
+- **Input Layer**: Comprises neurons equal to the number of features (predictors) in the dataset. For a dataset with $n$ features, there will be $n$ input neurons.
+
+- **Output Layer**: Contains multiple neurons, each corresponding to a different class to be predicted. If there are $m$ classes, then there will be $m$ output neurons.
+
+## Mathematical Model
+
+Given inputs $x_1, x_2, ..., x_n$ with corresponding weights $w_{jk}$ for each input neuron $j$ and output neuron $k$, and a bias term $b_k$ for each output neuron, the output $y_k$ for each class $k$ is calculated as follows:
+
+1. Compute the linear combination of inputs and weights, plus the bias, for each output neuron:
+
+$$
+z_k = \sum_{j=1}^{n} w_{jk}x_j + b_k \quad \text{for each class } k
+$$
+
+2. Apply the softmax function to the vector of $z_k$ values to get the output probabilities:
+
+$$
+y_k = \frac{e^{z_k}}{\sum_{l=1}^{m} e^{z_l}} \quad \text{for each class } k
+$$
+
+This output vector $(y_1, y_2, ..., y_m)$ represents the probabilities that the given input belongs to each of the $m$ classes.
+
+## Softmax Function Derivative
+
+The softmax function for a class $i$ in a vector of raw scores $\mathbf{z} = [z_1, z_2, ..., z_K]$ is given by:
+
+$$
+\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{k=1}^{K} e^{z_k}}
+$$
+
+We aim to find the derivative of $\text{softmax}(z_i)$ with respect to $z_j$, denoted as $\frac{\partial \text{softmax}(z_i)}{\partial z_j}$. There are two cases to consider: when $i = j$ and when $i \neq j$.
+
+### Case 1: When $i = j$
+
+When $i = j$, we use the quotient rule of differentiation, which states that for a function $g(x) = \frac{f(x)}{h(x)}$, the derivative is:
+
+$$
+g'(x) = \frac{f'(x)h(x) - f(x)h'(x)}{[h(x)]^2}
+$$
+
+Applying this to the softmax function:
+
+$$
+\frac{\partial \text{softmax}(z_i)}{\partial z_i} = \frac{e^{z_i} \sum_{k=1}^{K} e^{z_k} - e^{z_i}e^{z_i}}{\left(\sum_{k=1}^{K} e^{z_k}\right)^2}
+$$
+
+Simplifying, we get:
+
+$$
+\frac{\partial \text{softmax}(z_i)}{\partial z_i} = \frac{e^{z_i}}{\sum_{k=1}^{K} e^{z_k}} \left(1 - \frac{e^{z_i}}{\sum_{k=1}^{K} e^{z_k}}\right) = \text{softmax}(z_i) (1 - \text{softmax}(z_i))
+$$
+
+### Case 2: When $i \neq j$
+
+For $i \neq j$, the derivative includes only the term from the denominator's derivative of the quotient:
+
+$$
+\frac{\partial \text{softmax}(z_i)}{\partial z_j} = - \frac{e^{z_i}e^{z_j}}{\left(\sum_{k=1}^{K} e^{z_k}\right)^2} = -\text{softmax}(z_i) \text{softmax}(z_j)
+$$
+
+### Conclusion
+
+The derivative of the softmax function with respect to the input $z_j$ is thus:
+
+- When $i = j$: $\frac{\partial \text{softmax}(z_i)}{\partial z_i} = \text{softmax}(z_i) (1 - \text{softmax}(z_i))$
+- When $i \neq j$: $\frac{\partial \text{softmax}(z_i)}{\partial z_j} = -\text{softmax}(z_i) \text{softmax}(z_j)$
+
+This derivation shows how the change in any input score $z_j$ affects the softmax probability of class $i$, providing the foundation for computing gradients in networks using softmax for multi-class classification.
+
+
+## Learning Process for Multi-Class Classification Neural Network
+
+For multi-class classification, the neural network outputs a probability distribution over classes for each observation using the softmax function. The cross-entropy loss function quantifies the difference between the predicted probabilities and the actual distribution of the classes.
+
+### Cross-Entropy Loss Function
+
+The cross-entropy loss for multi-class classification is given by:
+
+$$
+L = -\frac{1}{N} \sum_{i=1}^{N} \sum_{k=1}^{m} y_{ik} \log(\hat{y}_{ik})
+$$
+
+Where:
+
+- $N$ is the number of observations.
+- $m$ is the number of classes.
+- $y_{ik}$ is a binary indicator (0 or 1) if class $k$ is the correct classification for observation $i$.
+- $\hat{y}_{ik}$ is the predicted probability that observation $i$ belongs to class $k$, calculated using the softmax function.
+
+### Softmax Function
+
+The softmax function for a class $k$ given a vector of raw scores $\mathbf{z}_i = [z_{i1}, z_{i2}, ..., z_{im}]$ for the $i$-th observation is:
+
+$$
+\hat{y}_{ik} = \text{softmax}(z_{ik}) = \frac{e^{z_{ik}}}{\sum_{j=1}^{m} e^{z_{ij}}}
+$$
+
+### Derivation of Partial Derivatives
+
+#### Update Rules for Weights and Biases
+
+The update rules for the model parameters (weights $w_{jk}$ and biases $b_k$) require computing the partial derivatives of the loss function with respect to these parameters.
+
+#### Partial Derivative of the Loss with Respect to Weights $w_{jk}$
+
+To update a weight $w_{jk}$, we need to compute $\frac{\partial L}{\partial w_{jk}}$. Using the chain rule, this derivative can be expressed as:
+
+$$
+\frac{\partial L}{\partial w_{jk}} = \sum_{i=1}^{N} \frac{\partial L_i}{\partial \hat{y}_{ik}} \cdot \frac{\partial \hat{y}_{ik}}{\partial z_{ik}} \cdot \frac{\partial z_{ik}}{\partial w_{jk}}
+$$
+
+Given the cross-entropy loss and softmax function, we can simplify this expression by noting that $\frac{\partial L_i}{\partial \hat{y}_{ik}} = -\frac{y_{ik}}{\hat{y}_{ik}}$, $\frac{\partial \hat{y}_{ik}}{\partial z_{ik}} = \hat{y}_{ik}(1-\hat{y}_{ik})$ when $i = j$ and $-\hat{y}_{ik}\hat{y}_{ij}$ when $i \neq j$, and $\frac{\partial z_{ik}}{\partial w_{jk}} = x_{ij}$.
+
+Combining these, we find that:
+
+$$
+\frac{\partial L}{\partial w_{jk}} = \sum_{i=1}^{N} (\hat{y}_{ik} - y_{ik}) \cdot x_{ij}
+$$
+
+#### Partial Derivative of the Loss with Respect to Biases $b_k$
+
+Similarly, to update a bias $b_k$, compute $\frac{\partial L}{\partial b_k}$:
+
+$$
+\frac{\partial L}{\partial b_k} = \sum_{i=1}^{N} (\hat{y}_{ik} - y_{ik})
+$$
+
+### Update Rules
+
+With these derivatives, the update rules for gradient descent become:
+
+- For weights $w_{jk}$:
+
+$$
+w_{jk} := w_{jk} - \alpha \left( \sum_{i=1}^{N} (\hat{y}_{ik} - y_{ik}) \cdot x_{ij} \right)
+$$
+
+- For biases $b_k$:
+
+$$
+b_k := b_k - \alpha \left( \sum_{i=1}^{N} (\hat{y}_{ik} - y_{ik}) \right)
+$$
+
+Where $\alpha$ is the learning rate.
+
+### Iterative Optimization
+
+Parameters are iteratively updated using these rules for each epoch until convergence criteria are met, effectively fitting the neural network model to the data for multi-class classification tasks.
+
+## Conclusion
+
+By structuring a simple neural network with multiple output neurons and using the softmax function for the output layer, we extend the logistic regression model to multi-class classification. This model learns to classify inputs into multiple categories, optimizing the weights and biases to minimize the cross-entropy loss.
+
+# Adjustments for Multi-Label Classification:
+Target Vector: For an observation that belongs to multiple classes, its target vector $y$ will have '1's in all positions corresponding to its classes and '0's elsewhere. For instance, if there are 5 possible classes and an observation belongs to classes 1 and 4, its target vector might look like $[1,0,0,1,0]$.
+
+Output Layer and Activation Function: The output layer still needs to have as many neurons as there are classes, similar to multi-class classification. However, instead of using the softmax function, which normalizes output scores into a probability distribution across mutually exclusive classes, you often use a sigmoid activation function independently on each output neuron. The sigmoid function will predict the probability of each class independently, allowing for multiple classes to be predicted simultaneously.
+
+Loss Function: While cross-entropy can still be used, it is applied in a slightly different manner. Instead of calculating the loss based on a single class prediction, the binary cross-entropy loss is calculated for each class independently, effectively treating each class as a separate binary classification problem.
+
+Example:
+Consider a dataset for image annotation where each image can be tagged with multiple labels like "Outdoor", "Animal", "Daytime". An image showing a dog in a park during the day would have a target vector $[1,1,1]$ assuming the classes are in the order mentioned.
+
+The learning process, including how you compute the output probabilities, adjust the loss function, and derive the update rules for the weights and biases, adapts to accommodate the independence of class predictions. Each output neuron's prediction is treated independently, allowing for the flexible assignment of multiple labels per observation.
+
+This adjustment allows the neural network to learn from and predict multiple classes for each observation, capturing the complexity of relationships in data where such multi-label configurations are common.
+
+
+## Learning Process for a Neural Network with Hidden Layers
+
+A neural network with hidden layers can model complex relationships in data by adding one or more layers of neurons between the input and output layers. Each neuron in these hidden layers can learn to represent a different aspect of the input data, making the network capable of understanding complex patterns before making predictions.
+
+### Network Structure
+
+- **Input Layer**: Receives the input features. For $n$ features, there are $n$ input neurons.
+- **Hidden Layers**: Comprise one or more layers of neurons that process inputs from the previous layer. Each neuron in a hidden layer computes a weighted sum of its inputs, adds a bias, and then applies an activation function.
+- **Output Layer**: Contains a neuron for each class and uses the softmax function to output a probability distribution over the classes.
+
+### Forward Propagation
+
+1. **From Input to Hidden Layers**: For each neuron in the hidden layer, compute:
+   $$ z^{[l]}_i = \sum_{j} w^{[l]}_{ij} a^{[l-1]}_j + b^{[l]}_i $$
+   $$ a^{[l]}_i = \sigma(z^{[l]}_i) $$
+   Where $a^{[l-1]}_j$ is the activation from the previous layer, $w^{[l]}_{ij}$ is the weight, $b^{[l]}_i$ is the bias, and $\sigma$ is the activation function.
+
+2. **Hidden Layers to Output Layer**:
+   The activation from the final hidden layer is passed to the output layer, where the softmax function calculates the probability distribution over classes.
+
+### Cross-Entropy Loss Function
+
+The loss is calculated using the cross-entropy formula for multi-class classification:
+$$ L = -\frac{1}{N} \sum_{i=1}^{N} \sum_{k=1}^{m} y_{ik} \log(\hat{y}_{ik}) $$
+
+### Backpropagation
+
+To update the weights and biases, we compute the gradients of the loss function with respect to each parameter in the network by applying the chain rule in reverse order, from the output layer back to the input layer.
+
+#### Update Rules for Weights and Biases
+
+- For each weight and bias, the update rule is:
+   - Weights ($w^{[l]}_{jk}$):
+     $$ w^{[l]}_{jk} := w^{[l]}_{jk} - \alpha \frac{\partial L}{\partial w^{[l]}_{jk}} $$
+   - Biases ($b^{[l]}_j$):
+     $$ b^{[l]}_j := b^{[l]}_j - \alpha \frac{\partial L}{\partial b^{[l]}_j} $$
+
+Where $\alpha$ is the learning rate.
+
+## Detailed Backpropagation Process and Update Rules
+
+Backpropagation is a fundamental algorithm for training neural networks, enabling the computation of gradients of the loss function with respect to all the network's weights and biases. This step-by-step guide offers an in-depth look at each stage of the process.
+
+### Network Structure and Notation
+
+- **Input Layer ($l=0$)**: Receives the feature inputs $x_i$.
+- **Hidden Layers ($l=1$ to $L-1$)**: Intermediate layers that transform inputs into features detectable by the output layer.
+- **Output Layer ($l=L$)**: Produces the network's predictions $\hat{y}$.
+
+Variables:
+
+- $a^{[l]}_i$: Activation of the $i$-th neuron in the $l$-th layer.
+- $z^{[l]}_i$: Weighted sum input to the $i$-th neuron's activation function in the $l$-th layer.
+- $w^{[l]}_{ji}$: Weight from the $i$-th neuron in the $(l-1)$-th layer to the $j$-th neuron in the $l$-th layer.
+- $b^{[l]}_j$: Bias for the $j$-th neuron in the $l$-th layer.
+- $L$: Loss function, e.g., cross-entropy for classification tasks.
+
+### Forward Propagation
+
+1. **Initialization**: 
+   - Input layer activations set to feature values: $a^{[0]}_i = x_i$.
+
+2. **Activation Computation**:
+   - For each layer from $1$ to $L$, compute:
+     $$ z^{[l]}_j = \sum_{i} w^{[l]}_{ji} a^{[l-1]}_i + b^{[l]}_j $$
+     $$ a^{[l]}_j = \sigma(z^{[l]}_j) $$
+   - $\sigma$ denotes the activation function (ReLU, sigmoid, etc.), applied element-wise.
+
+### Backpropagation: Error and Gradient Calculation
+
+#### Output Layer Error ($\delta^{[L]}$)
+
+- Directly derived from the loss function's gradient with respect to the activation in the output layer. For cross-entropy loss and softmax activation, it simplifies to the prediction error:
+  $$ \delta^{[L]}_j = \hat{y}_j - y_j $$
+
+#### Propagating Error Backwards
+
+- For each layer $l$ from $L-1$ down to $1$, compute the error term $\delta^{[l]}_j$:
+  $$ \delta^{[l]}_j = \left( \sum_k \delta^{[l+1]}_k w^{[l+1]}_{kj} \right) \cdot \sigma'(z^{[l]}_j) $$
+
+#### Detailed Explanation of Backpropagation Error Propagation
+
+Backpropagation is a method for computing gradients of the loss function with respect to each weight and bias in a neural network by propagating errors backward from the output layer to the input layer. A critical step is the calculation of the error term $\delta^{[l]}_j$ for each neuron $j$ in each layer $l$. This error term represents how much the neuron's output contributed to the error in the network's output.
+
+The formula for computing $\delta^{[l]}_j$ is given by:
+$$ \delta^{[l]}_j = \left( \sum_k \delta^{[l+1]}_k w^{[l+1]}_{kj} \right) \cdot \sigma'(z^{[l]}_j) $$
+
+Let's break down this formula:
+
+1. **Error Term for Neuron $j$ in Layer $l$**:
+   - $\delta^{[l]}_j$: This is what we're calculating. It quantifies the contribution of neuron $j$ in layer $l$ to the overall error.
+
+2. **Summation Over $k$**:
+   - $\sum_k \delta^{[l+1]}_k w^{[l+1]}_{kj}$: This part aggregates the errors from the layer above ($l+1$) that are propagated back to neuron $j$ in layer $l$. It is a weighted sum where each error term $\delta^{[l+1]}_k$ from layer $l+1$ is multiplied by the weight $w^{[l+1]}_{kj}$ that connects it to neuron $j$ in layer $l$. This effectively distributes the error from the output back through the network, accounting for the influence of each connection.
+
+3. **Derivative of the Activation Function**:
+   - $\sigma'(z^{[l]}_j)$: This is the derivative of the activation function applied to the weighted input $z^{[l]}_j$ of neuron $j$ in layer $l$. The activation function's derivative measures how sensitive the activation of neuron $j$ is to its weighted input. This sensitivity is crucial for determining how changes to the weights and biases will affect the loss.
+
+Combining these elements, the formula captures the essence of backpropagation: errors from the output layer are pushed back through the network, and at each neuron, the error is modulated by how much changing that neuron's output would affect the overall network error (as determined by the activation function's derivative).
+
+
+## Introduction
+
+This document presents the step-by-step derivation of the update rules for a neural network with the following architecture: 2 input neurons, 2 hidden layers each with 2 units, and 3 output neurons. We use the cross-entropy loss function for this purpose.
+
+## Network Architecture
+
+The network consists of:
+
+- Input layer: 2 neurons
+- First hidden layer: 2 units
+- Second hidden layer: 2 units
+- Output layer: 3 neurons
+
+## Loss Function
+
+The cross-entropy loss function for a multi-class classification problem is defined as:
+
+$$
+L = - \sum_{c=1}^{M} y_{o,c} \log(p_{o,c})
+$$
+
+where $M$ is the number of classes, $y$ is a binary indicator (0 or 1) if class label $c$ is the correct classification for observation $o$, and $p$ is the predicted probability observation $o$ is of class $c$.
+
+## Forward Propagation
+
+To compute the loss, we first perform forward propagation to get the output probabilities. Let's denote:
+
+- $x_i$: input features
+- $W^{[1]}$, $b^{[1]}$: weights and biases for the first hidden layer
+- $W^{[2]}$, $b^{[2]}$: weights and biases for the second hidden layer
+- $W^{[3]}$, $b^{[3]}$: weights and biases for the output layer
+- $\sigma()$: activation function (e.g., sigmoid, ReLU)
+
+The activations for each layer are computed as follows:
+
+1. First hidden layer:
+
+$$
+z^{[1]} = W^{[1]} x + b^{[1]}
+$$
+
+$$
+a^{[1]} = \sigma(z^{[1]})
+$$
+
+2. Second hidden layer:
+
+$$
+z^{[2]} = W^{[2]} a^{[1]} + b^{[2]}
+$$
+
+$$
+a^{[2]} = \sigma(z^{[2]})
+$$
+
+3. Output layer:
+
+$$
+z^{[3]} = W^{[3]} a^{[2]} + b^{[3]}
+$$
+
+$$
+a^{[3]} = \text{softmax}(z^{[3]})
+$$
+
+where $\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}$ for the output layer.
+
+## Backpropagation and Update Rules
+
+### Gradient of the Loss Function
+
+The gradient of the cross-entropy loss with respect to the output layer activation is:
+
+$$
+\frac{\partial L}{\partial a^{[3]}} = - \frac{y}{a^{[3]}} + \frac{1-y}{1-a^{[3]}}
+$$
+
+### Output Layer Weights and Biases
+
+The gradients of the loss with respect to the weights and biases in the output layer are:
+
+$$
+\frac{\partial L}{\partial W^{[3]}} = \frac{\partial L}{\partial a^{[3]}} \frac{\partial a^{[3]}}{\partial z^{[3]}} \frac{\partial z^{[3]}}{\partial W^{[3]}}
+$$
+
+$$
+\frac{\partial L}{\partial b^{[3]}} = \frac{\partial L}{\partial a^{[3]}} \frac{\partial a^{[3]}}{\partial z^{[3]}}
+$$
+
+### Hidden Layers Weights and Biases
+
+For the hidden layers, the process of updating weights and biases is critical for learning the correct representations. To compute these updates, we employ the backpropagation algorithm, which applies the chain rule of calculus to find the gradients of the loss function with respect to each weight and bias in the network. These gradients are then used to update the parameters in the direction that minimally decreases the loss.
+
+#### Gradients of the Loss with respect to Weights and Biases in Hidden Layers
+
+The computation of gradients for hidden layers involves several steps, working backward from the output layer to the input layer. This section focuses on calculating these gradients for the hidden layers.
+
+1. **Second Hidden Layer to Output Layer:**
+
+Let's denote the activation function derivative as $\sigma'(z)$, which depends on the choice of the activation function (e.g., $\sigma'(z) = \sigma(z)(1 - \sigma(z))$ for sigmoid).
+
+- **Gradient of the loss with respect to the weights of the second hidden layer ($W^{[2]}$):**
+
+$$
+\frac{\partial L}{\partial W^{[2]}} = \frac{\partial L}{\partial z^{[3]}} \frac{\partial z^{[3]}}{\partial a^{[2]}} \frac{\partial a^{[2]}}{\partial z^{[2]}} \frac{\partial z^{[2]}}{\partial W^{[2]}}
+$$
+
+Where:
+
+- $\frac{\partial L}{\partial z^{[3]}}$ is the gradient of the loss with respect to the output layer's weighted input, computed during the output layer gradient calculation.
+- $\frac{\partial z^{[3]}}{\partial a^{[2]}} = W^{[3]}$, since $z^{[3]} = W^{[3]}a^{[2]} + b^{[3]}$.
+- $\frac{\partial a^{[2]}}{\partial z^{[2]}} = \sigma'(z^{[2]})$, the derivative of the activation function with respect to the weighted input of the second hidden layer.
+- $\frac{\partial z^{[2]}}{\partial W^{[2]}} = a^{[1]}$, the activation from the first hidden layer.
+
+- **Gradient of the loss with respect to the biases of the second hidden layer ($b^{[2]}$):**
+
+$$
+\frac{\partial L}{\partial b^{[2]}} = \frac{\partial L}{\partial z^{[3]}} \frac{\partial z^{[3]}}{\partial a^{[2]}} \frac{\partial a^{[2]}}{\partial z^{[2]}} \frac{\partial z^{[2]}}{\partial b^{[2]}}
+$$
+
+Since $\frac{\partial z^{[2]}}{\partial b^{[2]}} = 1$, this simplifies to the product of the first three terms.
+
+2. **First Hidden Layer to Second Hidden Layer:**
+
+- **Gradient of the loss with respect to the weights of the first hidden layer ($W^{[1]}$):**
+
+$$
+\frac{\partial L}{\partial W^{[1]}} = \frac{\partial L}{\partial z^{[2]}} \frac{\partial z^{[2]}}{\partial a^{[1]}} \frac{\partial a^{[1]}}{\partial z^{[1]}} \frac{\partial z^{[1]}}{\partial W^{[1]}}
+$$
+
+Where:
+
+- $\frac{\partial L}{\partial z^{[2]}}$ is calculated similarly as above, by propagating the gradient back through the network.
+- $\frac{\partial z^{[2]}}{\partial a^{[1]}} = W^{[2]}$.
+- $\frac{\partial a^{[1]}}{\partial z^{[1]}} = \sigma'(z^{[1]})$.
+- $\frac{\partial z^{[1]}}{\partial W^{[1]}} = x$, the input features to the network.
+
+- **Gradient of the loss with respect to the biases of the first hidden layer ($b^{[1]}$):**
+
+$$
+\frac{\partial L}{\partial b^{[1]}} = \frac{\partial L}{\partial z^{[2]}} \frac{\partial z^{[2]}}{\partial a^{[1]}} \frac{\partial a^{[1]}}{\partial z^{[1]}} \frac{\partial z^{[1]}}{\partial b^{[1]}}
+$$
+
+#### Update Rules for Hidden Layers
+
+With the gradients calculated, the weights and biases of the hidden layers can be updated using the gradient descent algorithm. The update rules are:
+
+$$
+W^{[l]} = W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}}
+$$
+
+$$
+b^{[l]} = b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
+$$
+
+where $\eta$ is the learning rate, a hyperparameter that controls the size of the steps taken during the gradient descent.
+
+By iteratively applying these update rules during the training process, the neural network learns to minimize the loss function, thereby improving its predictions.
+
+## Conclusion
+
+This expanded section provides a detailed breakdown of how to compute the gradients of the loss function with respect to the weights and biases of the hidden layers in a neural network. By applying the chain rule in backpropagation, we can efficiently calculate these gradients and update the network's parameters to improve its performance on the given task.
+
+### Update Rules
+
+The update rules for the weights and biases at each layer $l$ using a learning rate $\eta$ are:
+
+$$
+W^{[l]} = W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}}
+$$
+
+$$
+b^{[l]} = b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
+$$
+
+
+### Backpropagation Using Delta Notation
+
+Backpropagation is a method used for computing gradients of the loss function with respect to the weights and biases in a neural network. The delta notation ($\Delta$) simplifies the representation of these gradients. In this section, we'll explain how to calculate these gradients using delta notation and relate it to updating the parameters of hidden layers.
+
+#### Delta Notation in Backpropagation
+
+In delta notation, $\delta^{[l]}$ represents the gradient of the loss function with respect to the net input to layer $l$ (i.e., the weighted sum before applying the activation function). This notation is particularly useful for expressing the chain of derivatives involved in backpropagation.
+
+- **Output Layer (L):** For the output layer, we start by calculating $\delta^{[L]}$, which is the derivative of the loss function with respect to the output layer's activations. For the cross-entropy loss function and softmax activation, $\delta^{[L]}$ can be simplified to $(a^{[L]} - y)$, where $a^{[L]}$ is the output activation vector and $y$ is the true label vector.
+
+- **Hidden Layers:** The deltas for the hidden layers are calculated by propagating the gradients backward from the output layer. The delta for each layer is computed based on the delta of the subsequent layer (layer closer to the output).
+
+#### Calculating Deltas for Hidden Layers
+
+1. **Second Hidden Layer ($\delta^{[2]}$):**
+
+$$
+\delta^{[2]} = (W^{[3]})^T \delta^{[3]} * \sigma'(z^{[2]})
+$$
+
+Here, $(W^{[3]})^T$ is the transpose of the weight matrix of the output layer, $\delta^{[3]}$ is the delta of the output layer, and $\sigma'(z^{[2]})$ is the derivative of the activation function with respect to the weighted input of the second hidden layer.
+
+2. **First Hidden Layer ($\delta^{[1]}$):**
+
+$$
+\delta^{[1]} = (W^{[2]})^T \delta^{[2]} * \sigma'(z^{[1]})
+$$
+
+#### Updating Weights and Biases Using Delta Notation
+
+With the deltas calculated, we can update the weights and biases in the network. The updates are performed using the gradients of the loss with respect to the parameters, which can be expressed using the deltas.
+
+- **Weights:** The update for the weights connecting layer $l-1$ to layer $l$ is given by:
+
+$$
+W^{[l]} = W^{[l]} - \eta \cdot \delta^{[l]} (a^{[l-1]})^T
+$$
+
+- **Biases:** The update for the biases in layer $l$ is:
+
+$$
+b^{[l]} = b^{[l]} - \eta \cdot \delta^{[l]}
+$$
+
+where $\eta$ is the learning rate.
+
+#### Conclusion
+
+The delta notation simplifies the representation of the gradients needed for backpropagation, allowing for an intuitive understanding of how errors are propagated backward through the network. By calculating the deltas for each layer and using them to update the weights and biases, we iteratively minimize the loss function, leading to improved performance of the neural network on the given task.
+
+## Conclusion
+
+This report outlined the derivation of the update rules for a neural network using the cross-entropy loss function. These steps include calculating the forward propagation to get the output probabilities, deriving the gradients of the loss function with respect to each parameter during backpropagation, and updating the parameters using gradient descent.
+
