@@ -1,0 +1,471 @@
+---
+title: "Basic Statistical Methods"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Basic Principles of Research Methodology
+
+This section provides an overview of the basic principles in research methodology, including sampling methods, study design, bias, and confounding. It aims to introduce fundamental concepts crucial for conducting rigorous research.
+
+## Sampling Methods
+
+### Definitions
+
+- **Population**: The entire group of individuals or instances about whom we hope to learn.
+- **Sample**: A subset of the population, selected for study.
+- **Census**: A study that includes every individual in the population.
+- **Parameter**: A numerical summary of a population.
+- **Statistic**: A numerical summary of a sample.
+
+We sample samples from populations and infer populations from samples.
+
+Generalizability is the degree to which a study's results can be applied to larger population
+
+### Sampling Techniques
+
+- **Simple Random Sampling**: Every member of the population has an equal chance of selection.
+- **Systematic Sampling**: Members are selected from a larger population according to a random starting point and a fixed periodic interval.
+- **Stratified Sampling**: The population is divided into strata, and random samples are taken from each stratum.
+- **Cluster Sampling**: The population is divided into clusters, and a random sample of these clusters is selected.
+
+### Data Types
+
+- **Quantitative vs. Categorical**: Including discrete and continuous for quantitative data; nominal and ordinal for categorical data.
+
+## Study Design and Bias
+
+### Study Designs
+
+- **Experiment**: Researchers apply treatments to experimental units (people, animals, etc.) and observe the effect of the treatments.
+- **Observational Study**: Researchers observe subjects and measure variables of interest without assigning treatments to the subjects.
+
+#### Types of Experiments
+
+- **Completely Randomized Design**: An experimental design where all subjects are randomly assigned to various treatment groups, ensuring each subject has an equal chance of receiving any treatment.
+- **Randomized Block Design**: Subjects are first divided into blocks based on a characteristic that is expected to affect the response to treatments. Within each block, subjects are randomly assigned to treatment groups, reducing variability and allowing for more precise estimates of treatment effects.
+- **Matched Pairs Design**: A design that involves either matching subjects based on specific characteristics and randomly assigning one of each pair to treatments, or using each subject as their own control by administering both treatments in a random order.
+- **Bad Experimental Design**: Treatment effect will be indistinguishable from another effect
+
+Good experiments include:
+
+- **Replication**: Repetition of experiment on more than one individual (large enough
+sample size)
+- **Blinding**: Subject doesn’t know whether they are receiving treatment or placebo/control
+- **Double-blinding**: treatment is coded in such a way that researchers do not know which is treatment and which is placebo/control until after the study has concluded
+- **Randomization**: Individuals are assigned to treatment groups through a process of random selection
+
+#### Observational Study Designs
+
+When are the observations made?
+
+- **Retrospective Study**: A study that looks backwards in time, usually using medical records and interviews with patients who are already known to have a disease or condition.
+- **Cross-sectional Study**: A study that analyzes data from a population at a specific point in time, often used to assess the prevalence of an outcome or to identify associations between variables.
+- **Prospective Study**: A study that follows subjects forward in time from a point of enrollment into the future, often used to determine the incidence of and risk factors for diseases or outcomes.
+
+How are the groups constructed?
+
+- **Case-Control Study**: Based on Outcome. Usually retrospective, use odds. Fix numbers of cases and controls
+- **Cohort Study**: Based on Exposure. Usually prospective, use risk. Fix numbers of exposures and non-exposures
+
+### Bias in Studies
+
+Check out [Catalog of Bias](https://catalogofbias.org/)
+
+- **Selection Bias**: Occurs when the selection of participants or their allocation to experimental groups introduces systematic differences that affect the study's outcome.
+- **Recall Bias**: A type of bias that arises in retrospective studies when participants do not remember previous events or experiences accurately, skewing the results.
+- **Attrition Bias**: Occurs when participants drop out of a long-term study, and the dropouts differ in important ways from those who remain, potentially skewing the study's results.
+- **Reporting Bias**: Not declaring conflicts of interest, underreporting negative results, underreporting methods.
+- **Voluntary Response Bias**: Respondents include themselves in a study
+- **Nonresponse bias**: Those who refuse to respond are different from those who respond.
+
+## Missing Data
+
+- **MCAR**: A data value is missing completely at random if its just as likely
+to be missing as any other data value (i.e. its missingness isn’t
+due to another factor)
+- **MNAR**: A data value is missing not at random if the missing value is
+related to the reason it is missing. Introduces bias.
+
+## Confounding
+
+- **Confounding Variable**: A variable that influences both the dependent and independent variables, causing a spurious association.
+
+### Addressing Confounding
+
+- **Randomization**: Assigning subjects to different treatment groups randomly.
+- **Stratification**: Analyzing data within strata of confounding variables.
+- **Adjustment**: Using statistical methods to adjust for the effects of confounding variables.
+
+# Descriptive Statistics Overview
+
+This section summarizes key concepts of descriptive statistics, focusing on analysis techniques for both one-variable and two-variable data sets. Descriptive statistics provide a way to summarize and understand the characteristics of data sets through numerical summaries and visual representations. Researchers can uncover patterns, trends, and relationships within their data, while also being mindful of common pitfalls.
+
+## Descriptive Statistics for One Variable
+
+### Definitions
+
+- **Quantitative Variables**: Variables that represent numerical values.
+- **Categorical Variables**: Variables that represent categories or groups.
+- **Histograms**: Graphical representations of the distribution of numerical data.
+- **Boxplots**: Charts that depict groups of numerical data through their quartiles and whiskers 1.5*IQR away from starts and ends of box.
+- **Mean**: The average of a data set.
+- **Median**: The middle value in a data set.
+- **Mode**: The most frequent value in a data set.
+- **Range**: The difference between the highest and lowest values in a data set.
+- **Interquartile Range (IQR)**: The range of the middle 50% of the data points.
+- **Standard Deviation**: A measure of the amount of variation or dispersion of a set of values.
+- **Z-Scores**: Standard scores that indicate how many standard deviations an element is from the mean.
+
+### Key Points
+
+- Importance of understanding data distribution through numerical summaries and visualizations.
+- Use of histograms and boxplots for graphical analysis.
+- Calculation and interpretation of mean, median, mode, range, IQR, and standard deviation.
+- The concept of z-scores for identifying outliers.
+
+## Descriptive Statistics for Two Variables
+
+### Understanding Relationships
+
+- Analysis of two variables to explore relationships and patterns.
+- Use of appropriate visualizations and summary statistics depending on the type of variables involved.
+
+### Types of Variable Combinations
+
+- **Two Categorical Variables**: Analysis involves cross-tabulations and bar charts.
+- **One Quantitative and One Categorical Variable**: Analysis includes comparing means or medians across groups using boxplots or bar charts.
+- **Two Quantitative Variables**: Analysis focuses on the correlation between the variables, often visualized through scatter plots.
+
+### Key Concepts
+
+- **Correlation**: A measure of the strength and direction of association between two quantitative variables.
+- **Causation**: Just because two variables are correlated does not imply that one causes the other.
+
+### Common Pitfalls
+
+- Assuming correlation implies causation.
+- Ignoring non-linear relationships between variables.
+
+# Basic Probability and Statistics
+
+This section provides an overview of fundamental statistical concepts including probability basics, screening tests, binomial and normal distributions, and sampling distributions. Each section introduces key terms and concepts essential for understanding statistical analysis in research. Understanding these fundamental concepts is crucial for conducting rigorous statistical analysis in research. This overview provides a foundation for further study and application in various fields of inquiry.
+
+## Probability with Tables
+
+### Key Concepts
+
+- **Probability**: The measure of the likelihood that an event will occur.
+- **Sample Space**: The set of all possible outcomes.
+- **Event**: A subset of the sample space.
+- **Relative Frequency**: The ratio of the number of times an event occurs to the total number of trials.
+- **Complementary Events**: Events that cover all possible outcomes of an experiment.
+- **Independent and Mutually Exclusive Events**.
+- **Conditional Probability**: The probability of an event given that another event has occurred.
+
+### Important Measures
+
+- **Risk**: The probability of an event occurring in a given population.
+- **Odds**: The ratio of the probability of an event occurring to the probability of it not occurring.
+- **Relative Risk**: A measure comparing the risk of an event among two groups.
+- **Odds Ratio**: The ratio of the odds of an event in two groups.
+
+## Screening Tests
+
+### Evaluation Metrics
+
+- **Sensitivity**: The ability of a test to correctly identify those with the disease.
+- **Specificity**: The ability of a test to correctly identify those without the disease.
+- **Positive Predictive Value (PPV)**: The probability that subjects with a positive screening test truly have the disease.
+- **Negative Predictive Value (NPV)**: The probability that subjects with a negative screening test truly do not have the disease.
+
+## Binomial Distribution
+
+### Overview
+
+- **Criteria for Binomial Scenario**: Fixed number of trials, independence, binary outcome, constant probability of success.
+- **Probability Mass Function**: Describes the probability distribution of a discrete random variable.
+- **Expected Value and Variance**: Key measures of central tendency and variability in a binomial distribution.
+
+## Normal Distribution
+
+### Characteristics
+
+- **Standard Normal Distribution**: A normal distribution with a mean of 0 and a standard deviation of 1.
+- **Z-Scores**: Measure the number of standard deviations an element is from the mean.
+- **Assessment of Normality**: Techniques include histograms and normal quantile plots.
+
+## Sampling Distributions
+
+### Central Limit Theorem (CLT)
+
+- **Estimators**: Statistics used to estimate population parameters.
+- **Sampling Distribution**: The probability distribution of a given statistic over many samples.
+- **Central Limit Theorem**: States that the sampling distribution of the sample mean approaches a normal distribution as the sample size increases, regardless of the population's distribution.
+
+# One-Sample Statistical Procedures Overview
+
+This section synthesizes key concepts on one-sample statistical procedures, covering confidence intervals, hypothesis testing for proportions and means, and practical applications using R. Understanding and applying these statistical procedures allows for more informed decision-making in research and data analysis. This overview provides a foundation for further exploration and application of statistical methods.
+
+## Confidence Intervals
+
+### CI for Proportion
+
+- **Point Estimate**: The sample proportion as the best estimate of the population proportion.
+- **Margin of Error**: The range of values above and below the point estimate.
+- **Wald Interval**: Standard method using the Z-distribution.
+- **Plus Four Method**: Adjusts the sample for finite population correction.
+- **Exact Binomial CI**: Uses the binomial distribution for precise calculations.
+
+### CI for Mean
+
+- **Student's t-Distribution**: Applied when population standard deviation is unknown, especially with smaller samples.
+- **Degrees of Freedom**: Calculated based on sample size.
+- **Sample Size Considerations**: Influences the width of the confidence interval.
+
+## Hypothesis Testing
+
+### Properties of Hypothesis Tests
+
+- **Type I Error (α)**: False positive rate.
+- **Type II Error (β)**: False negative rate.
+- **Power of a Test**: Probability of correctly rejecting a false null hypothesis.
+
+### Hypothesis Test for Proportion
+
+- **Z-Test**: Applicable when the sample size is large enough for normal approximation.
+- **Exact Binomial Test**: Used when Z-test conditions are not met.
+
+### Hypothesis Test for Mean
+
+- **One-Sample t-Test**: Used when estimating a population mean from a sample mean, especially with unknown σ.
+
+## Practical R Examples
+
+### Hypothesis Testing with R
+
+- **`prop.test` Function**: For testing proportions.
+- **`t.test` Function**: For testing means.
+- **Power and Sample Size Calculations**: Under construction
+
+# Analysis of Two Proportions and Chi-Squared Tests
+
+This section outlines the statistical methods for analyzing two proportions and the application of Chi-squared tests using contingency tables. Understanding and applying these tests allows for the rigorous analysis of categorical data, providing insights into relationships between variables and differences between groups.
+
+## Two Proportions Analysis
+
+### Independent vs. Dependent Samples
+
+- **Independent Samples**: No participant is in both samples.
+- **Dependent Samples**: Participants are related or matched between samples, requiring paired analysis.
+
+### Z-Test for Two Proportions
+
+- **Hypotheses Setup**: Defines null and alternative hypotheses comparing two proportions.
+- **Test Statistics**: Calculation involves the difference between sample proportions.
+- **Confidence Intervals**: Estimating the difference between two population proportions.
+
+### McNemar's Test for Dependent Samples
+
+- **Application**: Used for paired nominal data.
+- **Hypotheses**: Focuses on the discordant pairs.
+
+## Chi-Squared Tests
+
+### Goodness-of-Fit Test
+
+- **Purpose**: Assess if sample data fits a distribution from a population.
+
+### Test of Independence
+
+- **Objective**: Determine if two categorical variables are independent.
+- **Methodology**: Analysis of frequencies within a contingency table.
+
+### Test of Homogeneity
+
+- **Goal**: Compare the distribution of a categorical variable across different populations.
+
+## R Examples
+
+### `prop.test` Function
+
+- For comparing two or more proportions.
+
+### `chisq.test` Function
+
+- For performing Chi-squared tests on contingency tables.
+
+### Practical Applications
+
+- Examples include analysis of sleepless drivers, Hepatitis B testing, juror representation, and dolphin therapy effectiveness.
+
+# Two-Sample Means and Variances Analysis
+
+This section provides an overview of analyzing two-sample means and variances, focusing on paired means and independent samples with practical R examples. Understanding these statistical methods allows for rigorous analysis of continuous data, providing valuable insights in various research contexts.
+
+## Paired Means Analysis
+
+### Overview
+
+- **Paired t-Test**: Used to compare the means of two related groups to determine if there is a significant difference between them.
+
+### Conditions
+
+- Samples must be dependent.
+- Differences should be approximately normally distributed.
+
+### R Examples
+
+- Demonstrates how to conduct paired t-tests in R, calculating differences and interpreting results.
+
+## Two-Sample Means Analysis
+
+### Independent Samples
+
+- **Two-Sample t-Test**: Compares the means of two independent groups.
+
+### Variance Considerations
+
+- **Equal Variances**: Assumes population variances are equal.
+- **Unequal Variances**: Uses the Welch test when variances are assumed different.
+
+### R Implementation
+
+- Shows how to use the `t.test` function for both equal and unequal variances.
+
+## Key Vocabulary
+
+- **Paired t-Test**: A statistical method used for comparing two related samples.
+- **Two-Sample t-Test**: A method for comparing the means of two independent samples.
+- **Welch Test**: A version of the two-sample t-test that does not assume equal population variances.
+
+# Nonparametric Statistical Methods Overview
+
+This document provides an overview of nonparametric statistical methods, including the Sign Test, Wilcoxon Signed Rank Test, Wilcoxon Rank Sum Test, Fisher's Exact Test, and practical R examples for each. Nonparametric tests are crucial tools in statistical analysis, offering robust alternatives to parametric tests, especially in the absence of normal distribution assumptions or with small sample sizes.
+
+## Nonparametric Tests
+
+### Sign Test
+
+- **Purpose**: Used to test the median of a single sample or to compare the medians of two dependent samples.
+- **Assumptions**: None about the distribution of the data.
+- **Applications**: Ideal for small sample sizes or ordinal data.
+
+### Wilcoxon Signed Rank Test
+
+- **Purpose**: Compares two related samples to assess whether their population mean ranks differ.
+- **Assumptions**: The differences between pairs are symmetrically distributed.
+- **Applications**: Used when the paired samples do not meet the assumptions for a paired t-test.
+
+### Wilcoxon Rank Sum Test
+
+- **Purpose**: Compares two independent samples to determine if they come from the same distribution.
+- **Also Known As**: Mann-Whitney U test.
+- **Applications**: Suitable for ordinal data or continuous data that does not meet the assumptions of normality.
+
+### Fisher's Exact Test
+
+- **Purpose**: Tests for a non-random association between two categorical variables.
+- **Assumptions**: Data must be categorical.
+- **Applications**: Particularly useful when sample sizes are small.
+
+## R Examples
+
+### Performing Nonparametric Tests in R
+
+Each section includes R code snippets for performing the respective nonparametric tests, illustrating the application of these tests in practical research scenarios. 
+
+```{r, echo=TRUE}
+# Example of a Sign Test in R
+# SignTestFunction(data)
+
+# Example of a Wilcoxon Signed Rank Test in R
+# wilcox.test(data$Before, data$After, paired = TRUE)
+
+# Example of a Wilcoxon Rank Sum Test in R
+# wilcox.test(group1, group2)
+
+# Example of Fisher's Exact Test in R
+# fisher.test(table(data$Group1, data$Group2))
+```
+
+# ANOVA Analysis Overview with R
+
+This document provides an overview of ANOVA (Analysis of Variance), focusing on one-way and two-way ANOVA analyses, and demonstrates their implementation in R. ANOVA is a powerful tool for comparing means across multiple groups. This guide, coupled with practical R examples, offers a foundation for conducting and interpreting one-way and two-way ANOVA analyses.
+
+## One-way ANOVA
+
+### Key Concepts
+
+- **Purpose**: To compare means across three or more groups to see if at least one group mean is significantly different.
+- **Assumptions**: Independence of observations, normality of data, and homogeneity of variances.
+
+### Steps in R
+
+1. Load necessary libraries.
+2. Prepare data and check assumptions.
+3. Use `lm` and `Anova` functions for analysis.
+4. Conduct post-hoc tests with `emmeans` for pairwise comparisons.
+
+### Vocab
+
+- **F-statistic**: Ratio of between-group variance to within-group variance.
+- **P-value**: Probability of observing the test results under the null hypothesis.
+- **Bonferroni Correction**: Method to adjust significance levels in post-hoc testing to account for multiple comparisons.
+
+## Two-way ANOVA
+
+### Key Concepts
+
+- **Purpose**: To examine the influence of two different categorical independent variables on one continuous dependent variable.
+- **Interaction Effect**: Whether the effect of one independent variable on the dependent variable differs across the levels of the other independent variable.
+
+### Steps in R
+
+1. Fit the model using `lm()` specifying both factors and their interaction.
+2. Analyze the model with `Anova()` from the `car` package.
+3. Interpret main effects and interaction, considering `F-values` and `p-values`.
+4. Visualize interactions with interaction plots.
+
+## Vocab
+
+- **Main Effect**: The impact of an independent variable on a dependent variable ignoring other variables.
+- **Interaction Plot**: A graph showing how the relationship between one independent variable and the dependent variable changes across levels of another independent variable.
+
+# Linear Regression Analysis
+
+Linear regression is a statistical method for modeling the relationship between a dependent variable and one or more independent variables. Linear regression is a fundamental tool for predictive modeling and data analysis, offering insights into relationships between variables. The lm() function in R provides a powerful method for fitting linear models, with summary statistics and visualizations aiding in interpretation.
+
+## Key Concepts
+
+- **Dependent Variable**: The outcome variable we are trying to predict.
+- **Independent Variable(s)**: The predictor(s) used to explain variance in the dependent variable.
+- **Regression Coefficients**: Estimate the change in the dependent variable for a one-unit change in an independent variable.
+- **Least Squares Method**: A method to estimate the coefficients by minimizing the sum of squares of the residuals.
+
+## Assumptions of Linear Regression
+
+1. Linearity: The relationship between predictors and the outcome is linear.
+2. Independence: Observations are independent of each other.
+3. Homoscedasticity: Constant variance of error terms.
+4. Normality: The residuals of the model are normally distributed.
+
+## Implementing Linear Regression in R
+
+### Fitting a Model
+
+```{r}
+# model <- lm(dependent_variable ~ independent_variable, data = dataset)
+# summary(model)
+# plot(dataset$independent_variable, dataset$dependent_variable)
+# abline(model)
+```
+
+Interpretation: Focus on coefficient estimates, R-squared value, and p-values for significance testing.
+
+Visualizes the relationship and the fitted regression line.
