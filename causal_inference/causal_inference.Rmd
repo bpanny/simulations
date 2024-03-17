@@ -1,0 +1,53 @@
+---
+title: "causal_inference"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$$
+\begin{align*}
+\text{Total Effect} &= \text{Direct Effect} + \text{Indirect Effect} \\
+\text{Direct Effect} &= \frac{\partial Y}{\partial X} \\
+\text{Indirect Effect} &= \frac{\partial Y}{\partial M} \times \frac{\partial M}{\partial X} \\
+\end{align*}
+$$
+
+$$
+\text{Backdoor Criterion: If a set of variables } Z \text{ satisfies the backdoor criterion relative to an ordered pair } (X, Y), \\
+\text{then the causal effect of } X \text{ on } Y \text{ can be estimated by conditioning on } Z.
+$$
+
+$$
+\text{d-separation: A path } p \text{ is blocked by a set of nodes } Z \text{ if and only if:} \\
+1. \text{There is a chain } i \rightarrow m \rightarrow j \text{ or a fork } i \leftarrow m \rightarrow j \text{ on } p \text{ and the middle node } m \text{ is in } Z, \text{ or} \\
+2. \text{There is an inverted fork (collider) } i \rightarrow m \leftarrow j \text{ on } p \text{ and neither } m \text{ nor any of its descendants are in } Z.
+$$
+
+$$
+\text{Do-Calculus Rules:} \\
+1. \text{Insertion/deletion of observations: } P(y | do(x), z) = P(y | do(x)) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the mutilated graph.} \\
+2. \text{Action/observation exchange: } P(y | do(x), do(z)) = P(y | do(x), z) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the graph } G_{\overline{X}}. \\
+3. \text{Insertion/deletion of actions: } P(y | do(x), do(z)) = P(y | do(x)) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the graph } G_{\overline{X}\underline{Z}}.
+$$
+
+The Do-Calculus Rules:
+
+1. Insertion/deletion of observations: 
+$$P(y | do(x), z) = P(y | do(x)) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the mutilated graph.}$$ 
+This rule applies when the outcome $Y$ is independent of the variable $Z$, given the intervention on $X$ in a graph where the usual influences on $X$ are removed.
+
+2. Action/observation exchange: 
+$$P(y | do(x), do(z)) = P(y | do(x), z) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the graph } G_{\overline{X}}.$$
+Here, $\overline{X}$ means all incoming paths to $X$ are cut off, representing an intervention on $X$. This rule states that if $Y$ is independent of $Z$ given $X$ after this intervention, then observing $Z$ after intervening on $X$ gives the same outcome as intervening on both $X$ and $Z$.
+
+3. Insertion/deletion of actions: 
+$$P(y | do(x), do(z)) = P(y | do(x)) \text{ if } Y \perp\!\!\!\perp Z | X \text{ in the graph } G_{\overline{X}\underline{Z}}.$$
+In this notation, $\overline{X}$ means that we intervene on $X$ (cutting all incoming arrows to $X$), and $\underline{Z}$ means we ignore the consequences of intervening on $Z$ (cutting all outgoing arrows from $Z$). This rule implies that if $Y$ is independent of $Z$ after $X$ is intervened upon and $Z$'s effects are removed, then intervening on $Z$ does not change the distribution of $Y$ after $X$ has been intervened on.
+
+
+
