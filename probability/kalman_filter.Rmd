@@ -1,0 +1,97 @@
+---
+title: "Kalman Filter"
+author: "Benjamin Panny"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mathematically Defined
+
+$$
+\begin{align*}
+    \text{Predicted State Estimate} &: \hat{x}_{k|k-1} = F_k \hat{x}_{k-1|k-1} + B_k u_k \\
+    \text{Predicted Covariance Estimate} &: P_{k|k-1} = F_k P_{k-1|k-1} F_k^T + Q_k \\
+    \text{Innovation or Measurement Residual} &: y_k = z_k - H_k \hat{x}_{k|k-1} \\
+    \text{Innovation (Residual) Covariance} &: S_k = H_k P_{k|k-1} H_k^T + R_k \\
+    \text{Optimal Kalman Gain} &: K_k = P_{k|k-1} H_k^T S_k^{-1} \\
+    \text{Updated State Estimate} &: \hat{x}_{k|k-1} = \hat{x}_{k|k-1} + K_k y_k \\
+    \text{Updated Covariance Estimate} &: P_{k|k-1} = (I - K_k H_k) P_{k|k-1}
+\end{align*}
+$$
+
+$$
+\begin{align*}
+    &F_k: \text{State Transition model which is applied to the previous state } \hat{x}_{k-1|k-1}. \\
+    &B_k: \text{Control Input model which is applied to the control vector } u_k. \\
+    &u_k: \text{Control vector at time } k. \\
+    &P_{k|k-1}: \text{Predicted Covariance Estimate of the estimation error covariance.} \\
+    &Q_k: \text{Process noise covariance matrix, representing the process noise.} \\
+    &z_k: \text{Measurement at time } k. \\
+    &H_k: \text{Measurement model which maps the true state space into the observed space.} \\
+    &y_k: \text{Innovation or Measurement Residual at time } k. \\
+    &S_k: \text{Innovation (Residual) Covariance, representing the uncertainty in the measurement.} \\
+    &R_k: \text{Measurement noise covariance matrix, representing the measurement noise.} \\
+    &K_k: \text{Optimal Kalman Gain, minimizing the a posteriori error covariance.} \\
+    &\hat{x}_{k|k}: \text{Updated State Estimate at time } k \text{ given measurement } z_k. \\
+    &P_{k|k}: \text{Updated Covariance Estimate of the estimation error covariance.} \\
+    &I: \text{Identity matrix, with the same dimensions as } P_{k|k-1}.
+\end{align*}
+$$
+
+
+```{r}
+# Number of time steps
+n <- 100
+
+# True state initialization
+true_state <- numeric(n)
+true_state[1] <- 0 # initial true state
+
+# Process and measurement noise (variances)
+Q <- 1 # process noise variance
+R <- 4 # measurement noise variance
+
+# Generate true states and measurements
+for (i in 2:n) {
+  true_state[i] <- true_state[i-1] + rnorm(1, mean = 0, sd = sqrt(Q))
+}
+measurements <- true_state + rnorm(n, mean = 0, sd = sqrt(R))
+
+# Kalman Filter initialization
+estimated_state <- numeric(n) # To store the estimated states
+estimated_state[1] <- 0 # initial estimate
+P <- numeric(n) # To store the error covariance
+P[1] <- 1 # initial error covariance
+K <- numeric(n) # To store the Kalman Gain
+
+for (k in 2:n) {
+  # Prediction Update
+  predicted_state <- estimated_state[k-1] # since F = 1
+  predicted_P <- P[k-1] + Q
+  
+  # Measurement Update
+  K[k] <- predicted_P / (predicted_P + R)
+  estimated_state[k] <- predicted_state + K[k] * (measurements[k] - predicted_state)
+  P[k] <- (1 - K[k]) * predicted_P
+}
+
+# Plot the results
+plot(true_state, type = 'l', col = 'blue', ylim = range(c(true_state, measurements, estimated_state)), ylab = 'State', xlab = 'Time')
+points(measurements, col = 'red')
+lines(estimated_state, col = 'green')
+legend('topleft', legend = c('True State', 'Measurements', 'Estimated State'), col = c('blue', 'red', 'green'), lty = 1)
+```
+
+
+This code block does the following:
+- It generates a series of true states for a hypothetical system and then simulates measurements of these states with added noise.
+- It defines a simple Kalman Filter model using the `KFAS` package, which assumes the process noise and measurement noise covariances are both 1, but you can adjust these values based on your system.
+- It applies the Kalman Filter to the measurements to estimate the true states.
+- Finally, it plots the true states, the noisy measurements, and the Kalman Filter's estimates of the true states.
+
+
+

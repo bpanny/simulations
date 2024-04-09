@@ -1,0 +1,69 @@
+---
+title: "3 Variable SCMs"
+author: "Benjamin Panny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+
+This document contains diagrams, code, and basic math behind 3 variable structural causal models. Including sequential models, mediator models, moderator models, confounder models, and collider models.
+
+## Sequential Models
+
+Sequential models represent a causal sequence where one variable affects another, which in turn affects a third. In the case of three variables, this can be depicted as $A \rightarrow B \rightarrow C$, where $A$ affects $B$, and $B$ affects $C$.
+
+### Diagram
+
+To represent this model graphically, we can use the `DiagrammeR` package in R:
+
+```{r diagram-sequential, echo=TRUE}
+library(DiagrammeR)
+grViz("
+  digraph {
+    node [shape = box]
+    A -> B -> C
+  }
+")
+```
+
+### Mathematical Formulation
+
+Let's denote:
+
+$X$ as the independent variable,
+$M$ as the mediator variable that is affected by $X$ and affects $Y$,
+$Y$ as the outcome variable.
+The relationships can be described by the following equations:
+
+$M = \alpha + \beta_1X + \epsilon_1$,
+$Y = \gamma + \beta_2M + \epsilon_2$,
+where $\alpha, \beta_1, \beta_2,$ and $\gamma$ are parameters to be estimated, and $\epsilon_1, \epsilon_2$ are error terms.
+
+```{r}
+library(modelsummary)
+set.seed(123) # For reproducibility
+n <- 100 # Number of observations
+
+# Simulating the independent variable X
+X <- rnorm(n, mean = 0, sd = 1)
+
+# Simulating the mediator variable M
+M <- 0.5 + 0.4*X + rnorm(n, mean = 0, sd = 1)
+
+# Simulating the outcome variable Y
+Y <- -0.2 + 0.5*M + rnorm(n, mean = 0, sd = 1)
+
+# Fitting the model
+seq_model <- list(
+  "x_and_m" <- lm(Y ~ X + M),
+  "x" <- lm (Y ~ X),
+  "m" <- lm(Y ~ M)
+)
+modelsummary(seq_model, output = 'kableExtra')
+```
+
